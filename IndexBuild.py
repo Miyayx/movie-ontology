@@ -24,14 +24,12 @@ def m2e_build(fin) :
             continue
         mention = pair[0]
         entity = pair[1]
-        if mention in m2e.keys() :
-            enList = m2e[mention]
-            if entity not in enList :
-                enList.append(entity)
-        else :
-            m2e[mention] = [entity]
-    return m2e
+
+        m2e[mention] = m2e.get(mention, []) + [entity]
+
     fi.close()
+
+    return m2e
     
 def save_m2e(m2e,fout):
     fo = codecs.open(fout,'w',"utf-8")
@@ -44,12 +42,17 @@ def save_m2e(m2e,fout):
     fo.close()
     
 if __name__ == '__main__':
-    #m2e = m2e_build('./data/movie.mentions')
+    
+    import time
+    start = time.time()
+    m2e = m2e_build('./data/movie.mentions')
     #save_m2e(m2e, './data/mention.entity')
-    #trie = trie_build(m2e)
-    #trie.save('./data/m2e.trie')
+    trie = trie_build(m2e)
+    trie.save('./data/m2e.trie')
     
     trie = marisa_trie.Trie()
     trie.load('./data/m2e.trie')
-    result = trie.keys(u'有幸')
+    result = trie.keys(u'中国')
     print(result)
+
+    print time.time() - start

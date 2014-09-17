@@ -21,13 +21,11 @@ keg@Tsinghua
 
         yum install unixODBC unixODBC-devel
         pip install pyodbc 
-        pip install rdflib
 
 * Ubuntu:
 
         apt-get install unixODBC unixODBC-dev
         pip install pyodbc 
-        pip install rdflib
 
 Setting：
 
