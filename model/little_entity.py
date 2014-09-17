@@ -3,19 +3,16 @@
 
 class LittleEntity():
 
-    def __init__(self, _id, uri, type, title, super_topic, abstract, image, related_item ):
-        self._id        = _id
+    def __init__(self, id_, uri, title, alias = None, abstract=None, image=None):
+        self.id_        = id_
         self.uri        = uri
-        self.url        = url
-        self.type     = type
-        self.super_topic = super_topic
         self.title    = title
+        self.alias    = alias
         self.abstract = abstract
         self.image    = image
-        self.related_item    = related_item
 
     def __str__(self):
-        return "title:"+str(self.title)+"#"+"uri:"+str(self.uri)+"image_url:"+str(self.image)
+        return "title:"+str(self.title)+"\n"+"uri:"+str(self.uri)+"\nimage:"+str(self.image)+"\nabstract:"+str(self.abstract)
 
 
 

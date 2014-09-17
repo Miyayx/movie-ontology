@@ -37,7 +37,6 @@ class MovieKB():
     def create_conn(self):
         if MovieKB._virtodb:
             MovieKB._virtodb.close()
-        print "Create new connection"
         MovieKB._virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(MovieKB.DRIVER, MovieKB.HOST, MovieKB.PORT, MovieKB.UID, MovieKB.PWD))
         #MovieKB._virtodb = pyodbc.connect('DRIVER={VOS};HOST=%s:%d;UID=%s;PWD=%s'%(MovieKB.HOST, MovieKB.PORT, MovieKB.UID, MovieKB.PWD))
 
@@ -99,14 +98,13 @@ class MovieKB():
 
     def get_abstract(self, entity_id):
         sq = 'sparql select * from <keg-movie> where {<%sinstance/%s> <%scommon/summary> ?o }'%(PREFIX, entity_id, PREFIX)
-        print sq
         return self.fetch_one_result(sq)
 
     def create_littleentity(self, entity_id):
             
         entity = {}
         entity_id = str(entity_id)
-        entity["_id"] = entity_id
+        entity["id_"] = entity_id
         entity["uri"] = PREFIX+entity_id
 
         q_result = self.get_instance_properties(entity_id)
@@ -114,8 +112,10 @@ class MovieKB():
         d = self.parse_properties(q_result)
 
         entity["title"] = d["label/zh"][0]
-        entity["alias"] = d["alias"]
-        entity["abstract"] = d["summary"][0]
+        if d.has_key("alias"):
+            entity["alias"] = d["alias"]
+        if d.has_key("summary"):
+            entity["abstract"] = d["summary"][0]
         if d.has_key("firstimage"):
             entity["image"] = d["firstimage"][0]
 

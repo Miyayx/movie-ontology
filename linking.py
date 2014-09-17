@@ -6,6 +6,7 @@ import jieba
 import marisa_trie
 
 from model.query import Query
+from model.little_entity import LittleEntity
 from disambiguation import *
 from db import *
 
@@ -23,8 +24,7 @@ class MovieEL():
         self.get_entity()
         for q in self.queries:
             print q
-            print q.entity["title"]
-            print q.entity["abstract"]
+            print ""
         
 
     def word_segmentation(self, s):
@@ -83,8 +83,8 @@ class MovieEL():
                 print "candidate", cans
                 q.entity_id = Disambiguation(q.text, self.comment, cans).get_best()
                 le = self.db.create_littleentity(q.entity_id)
-                #q.entity = LittleEntity(**le)
-                q.entity = le
+                q.entity = LittleEntity(**le)
+                #q.entity = le
             else:
                 self.queries.remove(q)
 
@@ -115,10 +115,11 @@ if __name__=="__main__":
 
     db = MovieKB()
 
-    with codecs.open("./data/评论.txt", "r", "utf-8") as f:
-        c = f.readline().strip("\n")
-        movieel = MovieEL(c, trie, m_e)
-        movieel.db = db
-        movieel.run()
+    with codecs.open("./data/评论1.txt", "r", "utf-8") as f:
+        for c in f.readlines():
+            c = c.strip("\n")
+            movieel = MovieEL(c, trie, m_e)
+            movieel.db = db
+            movieel.run()
     
 
