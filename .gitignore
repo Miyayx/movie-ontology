@@ -3,3 +3,5 @@ config/
 nlpirpy/
 *.pyc
 
+/db.py
+/linking.py
