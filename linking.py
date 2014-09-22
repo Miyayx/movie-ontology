@@ -4,6 +4,7 @@
 import codecs
 import jieba
 import marisa_trie
+import re
 
 from model.query import Query
 from disambiguation import *
@@ -22,9 +23,9 @@ class MovieEL():
         self.extract_mentions()
         self.get_entity()
         for q in self.queries:
-            print q
-            print q.entity["title"]
-            print q.entity["abstract"]
+            print (q)
+            print (q.entity["title"])
+            print (q.entity["abstract"])
         
 
     def word_segmentation(self, s):
@@ -44,7 +45,7 @@ class MovieEL():
         return seg_index
     
     def extract_mentions(self):
-        print "comment:",self.comment
+        print ("comment:"+self.comment)
         segs = self.word_segmentation(self.comment)
     
         i = 0
@@ -67,7 +68,7 @@ class MovieEL():
             i += offset
     
         for q in self.queries:
-            print q.text, q.index
+            print (q.text+' '+ q.index)
 
     def get_entity(self):
 
@@ -80,7 +81,7 @@ class MovieEL():
             #s = q.text+":::"+";;;".join(q.candidates)
             #f.write(s+"\n")
             if cans:
-                print "candidate", cans
+                print ("candidate" +' ' +cans)
                 q.entity_id = Disambiguation(q.text, self.comment, cans).get_best()
                 le = self.db.create_littleentity(q.entity_id)
                 #q.entity = LittleEntity(**le)
@@ -97,10 +98,11 @@ class MovieEL():
 
 def load_mention_entity(fn):
     m_e = {}
-
-    for line in codecs.open(fn):
-        line = line.strip("\n")
-        m,es = line.split(":::")
+    fi =codecs.open(fn,'r',"utf-8")
+    for line in fi:
+#         line = line.strip()
+#         m,es = line.split(":::")
+        m,es = re.split(":::",line.strip("\n"))
         es = es.split("::;")
         m_e[m] = es[:-1]
 

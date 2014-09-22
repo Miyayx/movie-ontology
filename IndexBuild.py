@@ -1,9 +1,8 @@
-#!/usr/bin/python2.7
 #encoding=utf-8
 
 """
 Created  on 2014-9-10
-author: Jiangtao Zhang1
+author: Jiangtao Zhang
 """
 
 import codecs
@@ -55,4 +54,4 @@ if __name__ == '__main__':
     result = trie.keys(u'中国')
     print(result)
 
-    print time.time() - start
+    print (time.time() - start)

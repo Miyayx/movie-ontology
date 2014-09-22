@@ -1,12 +1,13 @@
 #!/usr/bin/python2.7
-#-*-coding:UTF-8-*-
+#encoding=utf-8
 
 import MySQLdb
 import pyodbc
 
-from urllib import quote
+from urllib import *
 
 from utils import *
+from symbol import except_clause
 
 PREFIX = 'http://keg.tsinghua.edu.cn/movie/'
 
@@ -17,15 +18,16 @@ class MovieKB():
     """
     
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
-    print "configs:",configs
+#     print ("configs:"+configs)
     HOST = configs["host"]
     PORT = int(configs["port"])
     UID  = configs["user"]
     PWD  = configs["password"]
     DRIVER = configs["driver"]
-    ##_virtodb = pyodbc.connect('DRIVER={VOS};HOST=%s:%d;UID=%s;PWD=%s'%(HOST, PORT, UID, PWD))
-    _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(DRIVER, HOST, PORT, UID, PWD))
-    
+#     print ('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(DRIVER, HOST, PORT, UID, PWD))
+#     _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%('VOS',HOST, PORT, UID, PWD))
+#     _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(DRIVER, HOST, PORT, UID, PWD))
+    _virtodb = pyodbc.connect("DSN=%s;UID=dba;PWD=dba" %("VOS") )
     def __new__(cls, *args, **kwargs):
         if not cls._virtodb:
             cls._virtodb = super(MovieKB, cls).__new__(cls, *args, **kwargs)
@@ -37,7 +39,7 @@ class MovieKB():
     def create_conn(self):
         if MovieKB._virtodb:
             MovieKB._virtodb.close()
-        print "Create new connection"
+        print ("Create new connection")
         MovieKB._virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(MovieKB.DRIVER, MovieKB.HOST, MovieKB.PORT, MovieKB.UID, MovieKB.PWD))
         #MovieKB._virtodb = pyodbc.connect('DRIVER={VOS};HOST=%s:%d;UID=%s;PWD=%s'%(MovieKB.HOST, MovieKB.PORT, MovieKB.UID, MovieKB.PWD))
 
@@ -54,7 +56,7 @@ class MovieKB():
             result = results.fetchone()[0]
             if type(result) == tuple:
                 result = result[0]
-        except TypeError,e:
+        except TypeError:
             return None
         finally:
             cursor.close()
@@ -72,7 +74,7 @@ class MovieKB():
             results = [r[0] for r in cursor.execute(sq).fetchall()]
             if results and len(results) > 0 and type(results[0]) == tuple:
                 results = [r[0] for r in results]
-        except TypeError,e:
+        except TypeError:
             return []
         finally:
             cursor.close()
@@ -99,7 +101,7 @@ class MovieKB():
 
     def get_abstract(self, entity_id):
         sq = 'sparql select * from <keg-movie> where {<%sinstance/%s> <%scommon/summary> ?o }'%(PREFIX, entity_id, PREFIX)
-        print sq
+        print (sq)
         return self.fetch_one_result(sq)
 
     def create_littleentity(self, entity_id):

@@ -27,7 +27,7 @@ class Disambiguation():
         """
 
         if len(self.candidates) == 1:
-            print "Has only one candidates "
+            print ("Has only one candidates ")
             return self.candidates
 
         for c in self.candidates:
@@ -57,12 +57,12 @@ class Disambiguation():
         return best
 
     def similar_cal(self, t, candidates):
-        print "candiates:",candidates
+        print ("candiates:" + ' '+candidates)
         for c in candidates:
-            print c
+            print (c)
             a = MovieKB().get_abstract(c)
             if a:
-                print c,"has abstract"
+                print (c,+' ' +"has abstract")
 
                 seg_list = jieba.cut(t, cut_all=False)
                 t = " ".join(seg_list)
@@ -70,9 +70,9 @@ class Disambiguation():
                 a = " ".join(seg_list)
 
                 self.c_sim[c] = self.similarity(t, a)
-                print "similarity:"
+                print ("similarity:")
                 for k,v in self.c_sim.items():
-                    print k,v
+                    print (k +' ' + v)
             else:
                 self.c_sim[c] = None
 
