@@ -24,8 +24,10 @@ class MovieEL():
         self.extract_mentions()
         self.get_entity()
         for q in self.queries:
-
-            print (q)
+#             outputstr = "Text: %s,Index: %d\nEntity:%d" % (q.text.encode("utf-8"),q.index,q.entity)
+#             print(q.text), print(q.entity)
+#             print (q)
+            pass
       
 
     def word_segmentation(self, s):
@@ -68,20 +70,23 @@ class MovieEL():
             i += offset
     
         for q in self.queries:
-            print (q.text+' '+ q.index)
+            print (q.text+' %d' % q.index)
 
     def get_entity(self):
 
         #f = codecs.open("./data/mentions.dat", "w","utf-8")
         for q in self.queries:
-            cans = self.can_set.get(q.text.encode("utf-8"), [])
+            cans = self.can_set.get(q.text, [])
+       
             q.candidates = cans
             cans = [c[1:-1].split("/")[-1] for c in cans]
+            
             #print q.text, q.candidates
             #s = q.text+":::"+";;;".join(q.candidates)
             #f.write(s+"\n")
             if cans:
-                print ("candidate" +' ' +cans)
+                print ("candidate of " +q.text)
+                print (cans)
                 q.entity_id = Disambiguation(q.text, self.comment, cans).get_best()
                 le = self.db.create_littleentity(q.entity_id)
                 q.entity = LittleEntity(**le)
@@ -117,7 +122,7 @@ if __name__=="__main__":
 
     db = MovieKB()
 
-    with codecs.open("./data/评论1.txt", "r", "utf-8") as f:
+    with codecs.open("./data/评论2.txt", "r", "utf-8") as f:
         for c in f.readlines():
             c = c.strip("\n")
             movieel = MovieEL(c, trie, m_e)

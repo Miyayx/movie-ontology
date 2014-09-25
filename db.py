@@ -1,8 +1,8 @@
-#!/usr/bin/python2.7
 #encoding=utf-8
 
 import MySQLdb
 import pyodbc
+import codecs
 
 from urllib import *
 
@@ -27,7 +27,7 @@ class MovieKB():
 #     print ('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(DRIVER, HOST, PORT, UID, PWD))
 #     _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%('VOS',HOST, PORT, UID, PWD))
 #     _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(DRIVER, HOST, PORT, UID, PWD))
-    _virtodb = pyodbc.connect("DSN=%s;UID=dba;PWD=dba" %("VOS") )
+    _virtodb = pyodbc.connect("DSN=VOS;UID=dba; PWD=dba;charset = utf-8"  )
     def __new__(cls, *args, **kwargs):
         if not cls._virtodb:
             cls._virtodb = super(MovieKB, cls).__new__(cls, *args, **kwargs)
@@ -41,8 +41,9 @@ class MovieKB():
             MovieKB._virtodb.close()
 
         print ("Create new connection")
+        MovieKB._virtodb = pyodbc.connect("DSN=%s;UID=dba;PWD=dba" %("VOS") )
 
-        MovieKB._virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(MovieKB.DRIVER, MovieKB.HOST, MovieKB.PORT, MovieKB.UID, MovieKB.PWD))
+#         MovieKB._virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(MovieKB.DRIVER, MovieKB.HOST, MovieKB.PORT, MovieKB.UID, MovieKB.PWD))
         #MovieKB._virtodb = pyodbc.connect('DRIVER={VOS};HOST=%s:%d;UID=%s;PWD=%s'%(MovieKB.HOST, MovieKB.PORT, MovieKB.UID, MovieKB.PWD))
 
     def fetch_one_result(self, sq):
@@ -130,5 +131,22 @@ class MovieKB():
         return entity
 
 if __name__ == "__main__":
-    mkb = MovieKB()
-    mkb.create_littleentity(11001038)
+#     mkb = MovieKB()
+#     mkb.get_abstract(11001038)
+    str_conn = "DSN=VOS;UID=dba; PWD=dba;charset = utf-8"
+    virto=pyodbc.connect(str_conn,unicode_results=True)
+    cursor = virto.cursor()
+    entity_id = 11500032
+    sq = 'sparql select * from <keg-movie> where {<%sinstance/%s> <%scommon/summary> ?o }'%(PREFIX, entity_id, PREFIX)
+    results = cursor.execute(sq)
+    try:
+        result = results.fetchone()[0]
+        print(codecs.decode(result,'utf8'))
+        if type(result) == tuple:
+            result = result[0]
+            print(result)
+    except TypeError as e:
+        print(e)
+    finally:
+        cursor.close()
+

@@ -57,7 +57,7 @@ class Disambiguation():
         return best
 
     def similar_cal(self, t, candidates):
-        print ("candiates:" + ' '+candidates)
+#         print ("candiates:" + ' '+candidates)
         for c in candidates:
             print (c)
             a = MovieKB().get_abstract(c)
