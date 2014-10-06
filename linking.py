@@ -22,10 +22,12 @@ class MovieEL():
     def run(self):
         self.extract_mentions()
         self.get_entity()
+
+        print "comment",self.comment
         for q in self.queries:
             print q
             print ""
-        
+
 
     def word_segmentation(self, s):
         """
@@ -81,12 +83,14 @@ class MovieEL():
             #f.write(s+"\n")
             if cans:
                 print "candidate", cans
-                q.entity_id = Disambiguation(q.text, self.comment, cans).get_best()
-                le = self.db.create_littleentity(q.entity_id)
-                q.entity = LittleEntity(**le)
-                #q.entity = le
-            else:
-                self.queries.remove(q)
+                es_sim = Disambiguation(q.text, self.comment, cans).get_candidate()
+                for e_id, sim in es_sim:
+                    le = self.db.create_littleentity(e_id)
+                    e = LittleEntity(**le)
+                    e.sim = sim
+                    q.entities.append(e)
+            #else:
+            #    self.queries.remove(q)
 
         #for q in self.queries:
         #    q.entity
@@ -115,11 +119,49 @@ if __name__=="__main__":
 
     db = MovieKB()
 
-    with codecs.open("./data/评论1.txt", "r", "utf-8") as f:
-        for c in f.readlines():
-            c = c.strip("\n")
-            movieel = MovieEL(c, trie, m_e)
-            movieel.db = db
-            movieel.run()
+    #fw = codecs.open("data/result.dat","w",'utf-8')
+
+    #with codecs.open("./data/评论1.txt", "r", "utf-8") as f:
+    #    for c in f.readlines():
+    #        c = c.strip("\n")
+    #        movieel = MovieEL(c, trie, m_e)
+    #        movieel.db = db
+    #        movieel.run()
+
+    #        fw.write("comment:"+c)
+    #        fw.write("\n------------------------------------\n")
+    #        for q in movieel.queries:
+    #            fw.write(str(q).decode("utf-8"))
+    #            fw.write("\n")
+    #        fw.write("====================================\n")
+
+    #fw.close()
+
+    import os
+    if not os.path.isdir("./data/comment-result"):
+        os.mkdir("./data/comment-result")
+    for name in os.listdir("./data/comment/"):
+        fw = codecs.open("./data/comment-result/"+name, "w", "utf-8")
+        with codecs.open("./data/comment/"+name, "r", "utf-8") as f:
+            for c in f.readlines():
+                if c.startswith(":::"):
+                    c = c.strip("\n").strip(":::")
+                    movieel = MovieEL(c, trie, m_e)
+                    movieel.db = db
+                    movieel.run()
+
+                    fw.write("comment:"+c)
+                    for q in movieel.queries:
+                        fw.write(q.text+"\t")
+                        for e in q.entities:
+                            print e.sim
+                            fw.write("%s,%s,%0.3f:::"%(e.id_, e.title.decode("utf-8"), e.sim))
+                        fw.write("\n")
+                    fw.write("====================================\n")
+
+        fw.close()
+
+
+
     
 

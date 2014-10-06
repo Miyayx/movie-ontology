@@ -7,7 +7,7 @@ class Query():
         self.text = text
         self.index = index
         self.candidates = []
-        self.entity = None
+        self.entities = []
 
     def __str__(self):
-        return "Text: "+self.text.encode("utf-8")+","+"Index: "+str(self.index)+"\nEntity:"+str(self.entity)
+        return "Text: "+self.text.encode("utf-8")+","+"Index: "+str(self.index)+"\nEntities:"+str(self.entities)

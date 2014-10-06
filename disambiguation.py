@@ -43,18 +43,32 @@ class Disambiguation():
         return best
 
     def get_best(self, num = 0):
-        if len(self.candidates) == 1:
-            return self.candidates[0]
+
+        #if len(self.candidates) == 1:
+        #    return self.candidates[0]
 
         self.similar_cal(self.doc, self.candidates)
 
         import operator
         if num <= 1 or not num:
-            best = max(self.c_sim.iteritems(), key=operator.itemgetter(1))[0]
-            
+            best = max(self.c_sim.iteritems(), key=operator.itemgetter(1))
+            print "best",best
+            best = set(best)
         else:
-            best = max(self.c_sim.iteritems(), key=operator.itemgetter(1))[:num]
+            best = sorted(self.c_sim.iteritems(), key=operator.itemgetter(1), reverse=True)[:num]
         return best
+
+    def get_candidate(self):
+        """
+        Returns:
+            return all candidate with their similarity
+        """
+
+        self.similar_cal(self.doc, self.candidates)
+
+        best = sorted(self.c_sim.items(), key=lambda x:x[1], reverse=True)
+        return best
+        
 
     def similar_cal(self, t, candidates):
         print "candiates:",candidates
@@ -74,7 +88,7 @@ class Disambiguation():
                 for k,v in self.c_sim.items():
                     print k,v
             else:
-                self.c_sim[c] = None
+                self.c_sim[c] = 0.0
 
     def similarity(self, t1, t2):
         return Distance.cosine_distance(t1.lower(), t2.lower());
