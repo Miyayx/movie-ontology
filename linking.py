@@ -23,13 +23,12 @@ class MovieEL():
     def run(self):
         self.extract_mentions()
         self.get_entity()
-
         print "comment",self.comment
         for q in self.queries:
-            outputstr = "Text: %s,Index: %d\nEntity:%d" % (q.text.encode("utf-8"),q.index,q.entity)
-            print(q.text) 
-            print(q.entity)
-            print (q)
+#             outputstr = "Text: %s,Index: %d\nEntity:%d" % (q.text.encode("utf-8"),q.index,q.entity)
+#             print(q.text), print(q.entity)
+#             print (q)
+            pass
       
     def word_segmentation(self, s):
         """
@@ -87,6 +86,7 @@ class MovieEL():
             #f.write(s+"\n")
             if cans:
                 print ("candidate of " +q.text)
+
                 es_sim = Disambiguation(q.text, self.comment, cans).get_candidate()
                 for e_id, sim in es_sim:
                     le = self.db.create_littleentity(e_id)
@@ -166,11 +166,11 @@ if __name__=="__main__":
 
         fw.close()
 
-   # with codecs.open("./data/评论2.txt", "r", "utf-8") as f:
-   #     for c in f.readlines():
-   #         c = c.strip("\n")
-   #         movieel = MovieEL(c, trie, m_e)
-   #         movieel.db = db
-   #         movieel.run()
+    with codecs.open("./data/评论2.txt", "r", "utf-8") as f:
+        for c in f.readlines():
+            c = c.strip("\n")
+            movieel = MovieEL(c, trie, m_e)
+            movieel.db = db
+            movieel.run()
     
 

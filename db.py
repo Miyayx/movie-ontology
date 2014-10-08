@@ -1,4 +1,4 @@
-#encoding=utf-8
+#-*-coding=utf-8-*-
 
 import MySQLdb
 import pyodbc
@@ -24,10 +24,8 @@ class MovieKB():
     UID  = configs["user"]
     PWD  = configs["password"]
     DRIVER = configs["driver"]
-#     print ('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(DRIVER, HOST, PORT, UID, PWD))
-#     _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%('VOS',HOST, PORT, UID, PWD))
-    _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(DRIVER, HOST, PORT, UID, PWD))
-#    _virtodb = pyodbc.connect("DSN=VOS;UID=dba; PWD=dba;charset = utf-8"  )
+    _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s;charset=UTF8'%(DRIVER, HOST, PORT, UID, PWD))
+    _virtodb = pyodbc.connect("DSN=VOS;UID=dba; PWD=dba;charset=UTF8"  )
     def __new__(cls, *args, **kwargs):
         if not cls._virtodb:
             cls._virtodb = super(MovieKB, cls).__new__(cls, *args, **kwargs)
@@ -142,6 +140,8 @@ if __name__ == "__main__":
 #     mkb.get_abstract(11001038)
     #str_conn = "DSN=VOS;UID=dba; PWD=dba;charset = utf-8"
     str_conn = 'DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(DRIVER, HOST, PORT, UID, PWD)
+    #str_conn = "DSN=VOS;UID=dba; PWD=dba;charset = utf-8"
+
     virto=pyodbc.connect(str_conn,unicode_results=True)
     cursor = virto.cursor()
     entity_id = 11500032
