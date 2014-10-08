@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 #-*-coding=utf-8-*-
 
-import MySQLdb
 import pyodbc
 import codecs
-
 from urllib import *
 
 from utils import *
 from symbol import except_clause
+from virtdb import *
 
 PREFIX = 'http://keg.tsinghua.edu.cn/movie/'
 
@@ -18,32 +17,16 @@ class MovieKB():
     --------------------------
     """
     
-    configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
-#     print ("configs:"+configs)
-    HOST = configs["host"]
-    PORT = int(configs["port"])
-    UID  = configs["user"]
-    PWD  = configs["password"]
-    DRIVER = configs["driver"]
-    _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s;charset=UTF-8'%(DRIVER, HOST, PORT, UID, PWD))
-    _virtodb = pyodbc.connect("DSN=VOS;UID=dba; PWD=dba;charset=UTF-8"  )
-    def __new__(cls, *args, **kwargs):
-        if not cls._virtodb:
-            cls._virtodb = super(MovieKB, cls).__new__(cls, *args, **kwargs)
-        return cls._virtodb
-
     def __init__(self):
-        pass
-
-    def create_conn(self):
-        if MovieKB._virtodb:
-            MovieKB._virtodb.close()
-
-        print ("Create new connection")
-        MovieKB._virtodb = pyodbc.connect("DSN=%s;UID=dba;PWD=dba" %("VOS") )
-
-#         MovieKB._virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(MovieKB.DRIVER, MovieKB.HOST, MovieKB.PORT, MovieKB.UID, MovieKB.PWD))
-        #MovieKB._virtodb = pyodbc.connect('DRIVER={VOS};HOST=%s:%d;UID=%s;PWD=%s'%(MovieKB.HOST, MovieKB.PORT, MovieKB.UID, MovieKB.PWD))
+        configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
+        import sys
+        if sys.platform == 'linux':
+            configs.pop("driver")
+            self.db = JenaVirtDB(**configs)
+            #self.db = OdbcVirtDB(**configs)
+        else:
+            configs.pop("driver")
+            self.db = JenaVirtDB(**configs)
 
     def fetch_one_result(self, sq):
         """
@@ -83,12 +66,11 @@ class MovieKB():
         return results
 
     def get_instance_properties(self, entity_id):
-        self.create_conn()
-        sq = 'sparql select * from <keg-movie> where {<%sinstance/%s> ?p ?o}'%(PREFIX,entity_id)
-        cursor = self._virtodb.cursor()
+        sq = 'select * from <keg-movie> where {<%sinstance/%s> ?p ?o}'%(PREFIX,entity_id)
+        result_set = self.db.query(sq)
         result = {}
-        for r in cursor.execute(sq).fetchall():
-            result[r[0][0]] = result.get(r[0][0],[]) + [r[1][0]]
+        for p, o in result_set:
+            result[p] = result.get(p,[]) + [o]
         return result
 
     def parse_properties(self, p2o):
@@ -102,11 +84,14 @@ class MovieKB():
         return result
 
     def get_abstract(self, entity_id):
-        sq = 'sparql select * from <keg-movie> where {<%sinstance/%s> <%scommon/summary> ?o }'%(PREFIX, entity_id, PREFIX)
+        #sq = 'select * from <keg-movie> where {<%sinstance/%s> <%scommon/summary> ?o }'%(PREFIX, entity_id, PREFIX)
+        sq = 'select * from <keg-movie> where {<%sinstance/%s> ?p ?o}'%(PREFIX,entity_id)
+        result_set = self.db.query(sq)
+        for p, o in result_set:
+            if p.endswith('common/summary'):
+                return o
 
-        print (sq)
-
-        return self.fetch_one_result(sq)
+        #return self.fetch_one_result(sq)
 
     def create_littleentity(self, entity_id):
             
@@ -131,33 +116,7 @@ class MovieKB():
 
 if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
-#     print ("configs:"+configs)
-    HOST = configs["host"]
-    PORT = int(configs["port"])
-    UID  = configs["user"]
-    PWD  = configs["password"]
-    DRIVER = configs["driver"]
-#     mkb = MovieKB()
-#     mkb.get_abstract(11001038)
-    #str_conn = "DSN=VOS;UID=dba; PWD=dba;charset = utf-8"
-    str_conn = 'DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(DRIVER, HOST, PORT, UID, PWD)
-    #str_conn = "DSN=VOS;UID=dba; PWD=dba;charset = utf-8"
-
-#     mkb = MovieKB()
-#     mkb.get_abstract(11001038)
-    virto=pyodbc.connect(str_conn,unicode_results=True)
-    cursor = virto.cursor()
-    entity_id = 11500032
-    sq = 'sparql select * from <keg-movie> where {<%sinstance/%s> <%scommon/summary> ?o }'%(PREFIX, entity_id, PREFIX)
-    results = cursor.execute(sq)
-    try:
-        result = results.fetchone()[0]
-        print(codecs.decode(result,'utf8'))
-        if type(result) == tuple:
-            result = result[0]
-            print(result)
-    except TypeError as e:
-        print(e)
-    finally:
-        cursor.close()
+    mkb = MovieKB()
+    print (mkb.get_abstract(11001038))
+    print (mkb.get_instance_properties(11001038))
 
