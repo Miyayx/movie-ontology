@@ -1,5 +1,5 @@
-#!/usr/bin/env python2.7
-#encoding=utf-8
+#!/usr/bin/env python
+#-*-coding=utf-8-*-
 
 import codecs
 import jieba
@@ -87,7 +87,17 @@ class MovieEL():
             if cans:
                 print ("candidate of " +q.text)
 
-                es_sim = Disambiguation(q.text, self.comment, cans).get_candidate()
+                args = {
+                        "mention" : q.text, 
+                        "cans": cans, 
+                        "doc" : self.comment,
+                        "db"  : self.db,
+                        "threshold":None
+                        }
+
+                d = Disambiguation(context_sim, args)
+                es_sim = d.get_sorted_cans()
+
                 for e_id, sim in es_sim:
                     le = self.db.create_littleentity(e_id)
                     e = LittleEntity(**le)
@@ -160,7 +170,7 @@ if __name__=="__main__":
                         fw.write(q.text+"\t")
                         for e in q.entities:
                             print e.sim
-                            fw.write("%s,%s,%0.3f:::"%(e.id_, e.title.decode("utf-8"), e.sim))
+                            fw.write("%s,%s,%0.3f:::"%(e.id_, e.title, e.sim))
                         fw.write("\n")
                     fw.write("====================================\n")
 

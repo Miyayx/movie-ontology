@@ -12,86 +12,77 @@ from collections import Counter
 from model.query import Query
 from db import *
 
-class Disambiguation():
-
-    def __init__(self, m, d, candidates):
-        self.mention = m
-        self.doc = d
-        self.candidates = candidates
-        self.c_sim = {}
-        self.threshold = 0.9
-
-    def get_best_use_title(self, num = 0):
-        """
-        Calculate the edit distance between two titles and get the most similar ones
-        """
-
-        if len(self.candidates) == 1:
-            print ("Has only one candidates ")
-            return self.candidates
-
-        for c in self.candidates:
-            t = Xlore().get_en_title(c)
-            self.c_sim[c] = Distance.levenshtein(self.doc, t)
-
-        import operator
-        if num <= 1 or not num:
-            best = min(self.c_sim.iteritems(), key=operator.itemgetter(1))[0]
-            
-        else:
-            best = sorted(self.c_sim.keys(), key=self.c_sim.get)[:num]
-        return best
-
-    def get_best(self, num = 0):
-
-        #if len(self.candidates) == 1:
-        #    return self.candidates[0]
-
-        self.similar_cal(self.doc, self.candidates)
-
-        import operator
-        if num <= 1 or not num:
-            best = max(self.c_sim.iteritems(), key=operator.itemgetter(1))
-            print "best",best
-            best = set(best)
-        else:
-            best = sorted(self.c_sim.iteritems(), key=operator.itemgetter(1), reverse=True)[:num]
-        return best
-
-    def get_candidate(self):
-        """
-        Returns:
-            return all candidate with their similarity
-        """
-
-        self.similar_cal(self.doc, self.candidates)
-
-        best = sorted(self.c_sim.items(), key=lambda x:x[1], reverse=True)
-        return best
-        
-
-    def similar_cal(self, t, candidates):
+################# Strategy ####################
+def context_sim(mention, cans, doc, db, num=0, threshold=None):
+    """
+    Compare context of comment and abstract of entity 
+    """
+    c_sim = {}
+    
+    def similar_cal(t, cans):
 #         print ("candiates:" + ' '+candidates)
-        for c in candidates:
+        for c in cans:
             print (c)
-            a = MovieKB().get_abstract(c)
+            a = db.get_abstract(c)
             if a:
-                print (c,+' ' +"has abstract")
+                print (c+' ' +'has abstract')
 
                 seg_list = jieba.cut(t, cut_all=False)
                 t = " ".join(seg_list)
                 seg_list = jieba.cut(a, cut_all=False)
                 a = " ".join(seg_list)
 
-                self.c_sim[c] = self.similarity(t, a)
+                c_sim[c] = similarity(t, a)
                 print ("similarity:")
-                for k,v in self.c_sim.items():
-                    print (k +' ' + v)
+                for k,v in c_sim.items():
+                    print (k +' ' + str(v))
             else:
-                self.c_sim[c] = 0.0
+                c_sim[c] = 0.0
 
-    def similarity(self, t1, t2):
+    def similarity(t1, t2):
         return Distance.cosine_distance(t1.lower(), t2.lower());
+    #if len(self.candidates) == 1:
+    #    return self.candidates[0]
+
+    similar_cal(doc, cans)
+
+    if threshold:
+        for k,v in c_sim.items():
+            if v < threshold:
+                c_sim.popitem(k)
+
+    return c_sim
+
+
+class Disambiguation():
+
+    def __init__(self, func=None, args = {}):
+
+        if not func:
+            raise ValueError("Not add strategy")
+        self.func = func
+        self.args = args
+
+    def get_best(self):
+        import operator
+        c_sim = self.func(**self.args)
+        best = max(c_sim.iteritems(), key=operator.itemgetter(1))
+        print "best",best
+        best = set(best)
+
+    def get_sorted_cans(self, num=0):
+        """
+        Returns:
+            return all candidate with their similarity
+        """
+
+        c_sim = self.func(**self.args)
+
+        best = sorted(c_sim.items(), key=lambda x:x[1], reverse=True)
+        if num:
+            return best[:num]
+        else:
+            return best
 
 
 class Distance():
