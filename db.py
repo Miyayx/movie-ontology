@@ -25,8 +25,8 @@ class MovieKB():
     UID  = configs["user"]
     PWD  = configs["password"]
     DRIVER = configs["driver"]
-    _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s;charset=UTF8'%(DRIVER, HOST, PORT, UID, PWD))
-    #_virtodb = pyodbc.connect("DSN=VOS;UID=dba; PWD=dba;charset=UTF8"  )
+    _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s;charset=UTF-8'%(DRIVER, HOST, PORT, UID, PWD))
+    _virtodb = pyodbc.connect("DSN=VOS;UID=dba; PWD=dba;charset=UTF-8"  )
     def __new__(cls, *args, **kwargs):
         if not cls._virtodb:
             cls._virtodb = super(MovieKB, cls).__new__(cls, *args, **kwargs)
