@@ -4,6 +4,7 @@
 import codecs
 import jieba
 import marisa_trie
+import re
 
 from model.query import Query
 from model.little_entity import LittleEntity
@@ -25,10 +26,11 @@ class MovieEL():
 
         print "comment",self.comment
         for q in self.queries:
-            print q
-            print ""
-
-
+            outputstr = "Text: %s,Index: %d\nEntity:%d" % (q.text.encode("utf-8"),q.index,q.entity)
+            print(q.text) 
+            print(q.entity)
+            print (q)
+      
     def word_segmentation(self, s):
         """
         Returns:
@@ -46,7 +48,7 @@ class MovieEL():
         return seg_index
     
     def extract_mentions(self):
-        print "comment:",self.comment
+        print ("comment:"+self.comment)
         segs = self.word_segmentation(self.comment)
     
         i = 0
@@ -69,20 +71,22 @@ class MovieEL():
             i += offset
     
         for q in self.queries:
-            print q.text, q.index
+            print (q.text+' %d' % q.index)
 
     def get_entity(self):
 
         #f = codecs.open("./data/mentions.dat", "w","utf-8")
         for q in self.queries:
-            cans = self.can_set.get(q.text.encode("utf-8"), [])
+            cans = self.can_set.get(q.text, [])
+       
             q.candidates = cans
             cans = [c[1:-1].split("/")[-1] for c in cans]
+            
             #print q.text, q.candidates
             #s = q.text+":::"+";;;".join(q.candidates)
             #f.write(s+"\n")
             if cans:
-                print "candidate", cans
+                print ("candidate of " +q.text)
                 es_sim = Disambiguation(q.text, self.comment, cans).get_candidate()
                 for e_id, sim in es_sim:
                     le = self.db.create_littleentity(e_id)
@@ -101,10 +105,11 @@ class MovieEL():
 
 def load_mention_entity(fn):
     m_e = {}
-
-    for line in codecs.open(fn):
-        line = line.strip("\n")
-        m,es = line.split(":::")
+    fi =codecs.open(fn,'r',"utf-8")
+    for line in fi:
+#         line = line.strip()
+#         m,es = line.split(":::")
+        m,es = re.split(":::",line.strip("\n"))
         es = es.split("::;")
         m_e[m] = es[:-1]
 
@@ -161,7 +166,11 @@ if __name__=="__main__":
 
         fw.close()
 
-
-
+   # with codecs.open("./data/评论2.txt", "r", "utf-8") as f:
+   #     for c in f.readlines():
+   #         c = c.strip("\n")
+   #         movieel = MovieEL(c, trie, m_e)
+   #         movieel.db = db
+   #         movieel.run()
     
 

@@ -1,7 +1,13 @@
 #/usr/bin/python2.7
 #encoding=utf-8
 import codecs
-from ConfigParser import ConfigParser
+import platform
+v= platform.python_version()
+
+if v.startswith('2') :
+    from ConfigParser import ConfigParser
+elif v.startswith('3') :
+    from configparser import ConfigParser
 
 def common_items(a,b):
     """
