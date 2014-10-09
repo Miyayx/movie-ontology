@@ -66,6 +66,12 @@ class MovieKB():
         return results
 
     def get_instance_properties(self, entity_id):
+        """
+        Returns:
+        result:dict
+            k: shortcomming of property
+            v: list of object
+        """
         sq = 'select * from <keg-movie> where {<%sinstance/%s> ?p ?o}'%(PREFIX,entity_id)
         result_set = self.db.query(sq)
         result = {}
@@ -83,6 +89,90 @@ class MovieKB():
 
         return result
 
+    def get_prop_entities(self, entity_id):
+
+        def deep_instance(d, p):
+            """
+            获取instance地址下的label
+            """
+            s = set()
+            if d.has_key(p):
+                for e in d[p]:#注意value是list形式的
+                    if e.startswith("http"):
+                        i = e.split("/")[-1]
+                        l = self.get_label(i)
+                        if not l:
+                            return s
+                        if "[" in l:
+                            s.add(l[:l.index("[")])
+                        else: s.add(l)
+                    else: s.add(e)
+            return s
+
+        def deep_concept(d, p):
+            """
+            获取concept地址下的label
+            """
+            s = set()
+            if d.has_key(p):
+                for e in d[p]: #注意value是list形式的
+                    if e.startswith("http"):
+                        i = e.split("/")[-1]
+                        l = self.get_concept_label(i)
+                        if not l:
+                            return s
+                        if "[" in l:
+                            s.add(l[:l.index("[")])
+                        else: s.add(l)
+                    else: s.add(e)
+            return s
+
+        def extract_ins(d, p):
+            """
+            从summary和description中提取[[]]之间的实体内容
+            """
+            s = set()
+            t = ""
+            if d.has_key(p):
+                for string in d[p]:#注意value是list形式的
+                    while True:
+                        if "[[" in string and "]]" in string:
+                            start = string.index("[[") + 2
+                            end = string.index("]]", start) 
+                            t = string[start:end]
+                            s.add(t.split("||")[0])
+                            string = string[end:]
+                        else: break
+
+            return s
+
+        q_result = self.get_instance_properties(entity_id)
+        d = self.parse_properties(q_result)
+
+        es = set()
+        #不能有label啊，不然肯定有共现的词
+        #es.add(d["label/zh"][0])
+
+        if not d.has_key("label/zh"):
+            #连label都没有。。。扔掉！
+            return es
+        
+        if d.has_key("alias"):
+            es = es.union(set(d["alias"]))
+        es = es.union(deep_concept(d, "instanceOf"))
+        # For movie
+        es = es.union(deep_instance(d,"directed_by"))
+        es = es.union(deep_instance(d,"written_by"))
+        es = es.union(deep_instance(d,"actor_list"))
+        # For actor
+        es = es.union(deep_instance(d,"work_list"))
+        es = es.union(deep_instance(d,"profession/zh"))
+        es = es.union(extract_ins(d, "summary"))
+        es = es.union(extract_ins(d, "description/zh"))
+
+        return es
+
+
     def get_abstract(self, entity_id):
         #sq = 'select * from <keg-movie> where {<%sinstance/%s> <%scommon/summary> ?o }'%(PREFIX, entity_id, PREFIX)
         sq = 'select * from <keg-movie> where {<%sinstance/%s> ?p ?o}'%(PREFIX,entity_id)
@@ -92,6 +182,21 @@ class MovieKB():
                 return o
 
         #return self.fetch_one_result(sq)
+
+    def get_label(self, entity_id):
+        #sq = 'select * from <keg-movie> where {<%sinstance/%s> <%scommon/summary> ?o }'%(PREFIX, entity_id, PREFIX)
+        sq = 'select * from <keg-movie> where {<%sinstance/%s> ?p ?o}'%(PREFIX,entity_id)
+        result_set = self.db.query(sq)
+        for p, o in result_set:
+            if p.endswith('label/zh'):
+                return o
+
+    def get_concept_label(self, entity_id):
+        sq = 'select * from <keg-movie> where {<%sconcept/%s> ?p ?o}'%(PREFIX,entity_id)
+        result_set = self.db.query(sq)
+        for p, o in result_set:
+            if p.endswith('label/zh'):
+                return o
 
     def create_littleentity(self, entity_id):
             
@@ -117,6 +222,6 @@ class MovieKB():
 if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
     mkb = MovieKB()
-    print (mkb.get_abstract(11001038))
-    print (mkb.get_instance_properties(11001038))
+    mkb.get_prop_entities(12051504)
+
 

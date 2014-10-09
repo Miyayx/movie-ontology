@@ -89,7 +89,6 @@ class JenaVirtDB(VirtDB):
         pass
 
     def query(self, sq):
-        print ("query %s")%sq
         r_list = []
         result = self.db.query(sq)
         for r in result:
@@ -103,7 +102,7 @@ if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
     configs.pop("driver")
     db = JenaVirtDB(**configs)
-    string = "select * where {<http://keg.tsinghua.edu.cn/movie/instance/" + str(11500030) + "> ?p"+" ?o}"
+    string = "select * where {<http://keg.tsinghua.edu.cn/movie/instance/" + str(11038951) + "> ?p"+" ?o}"
     for r in db.query(string):
         print r[0], r[1]
     

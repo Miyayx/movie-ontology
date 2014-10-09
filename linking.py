@@ -74,43 +74,47 @@ class MovieEL():
 
     def get_entity(self):
 
-        #f = codecs.open("./data/mentions.dat", "w","utf-8")
+        mentions = [q.text for q in self.queries]
         for q in self.queries:
+            q.entities = []
             cans = self.can_set.get(q.text, [])
        
             q.candidates = cans
             cans = [c[1:-1].split("/")[-1] for c in cans]
             
-            #print q.text, q.candidates
-            #s = q.text+":::"+";;;".join(q.candidates)
-            #f.write(s+"\n")
             if cans:
                 print ("candidate of " +q.text)
 
+                ######## context_sim ##########
+                #args = {
+                #        "mention" : q.text, 
+                #        "cans": cans, 
+                #        "doc" : self.comment,
+                #        "db"  : self.db,
+                #        "threshold":None
+                #        }
+
+                #d = Disambiguation(context_sim, args)
+
+                ############# entity_cooccur ###########
                 args = {
-                        "mention" : q.text, 
-                        "cans": cans, 
-                        "doc" : self.comment,
-                        "db"  : self.db,
-                        "threshold":None
+                        "mentions":mentions,
+                        "cans":cans,
+                        "mention":q.text,
+                        "db":self.db,
+                        "threshold":0.3
                         }
+                d = Disambiguation(entity_cooccur, args)
 
-                d = Disambiguation(context_sim, args)
-                es_sim = d.get_sorted_cans()
+                can_sim = d.get_sorted_cans(num=3) #top 3
 
-                for e_id, sim in es_sim:
+                for e_id, sim in can_sim:
                     le = self.db.create_littleentity(e_id)
                     e = LittleEntity(**le)
                     e.sim = sim
                     q.entities.append(e)
             #else:
             #    self.queries.remove(q)
-
-        #for q in self.queries:
-        #    q.entity
-        #    print q.entity.entity_id, q.entity.abstract
-
-        #f.close()
 
 
 def load_mention_entity(fn):
@@ -134,53 +138,57 @@ if __name__=="__main__":
 
     db = MovieKB()
 
-    #fw = codecs.open("data/result.dat","w",'utf-8')
+    fw = codecs.open("data/comment1-result.dat","w",'utf-8')
 
-    #with codecs.open("./data/评论1.txt", "r", "utf-8") as f:
-    #    for c in f.readlines():
-    #        c = c.strip("\n")
-    #        movieel = MovieEL(c, trie, m_e)
-    #        movieel.db = db
-    #        movieel.run()
-
-    #        fw.write("comment:"+c)
-    #        fw.write("\n------------------------------------\n")
-    #        for q in movieel.queries:
-    #            fw.write(str(q).decode("utf-8"))
-    #            fw.write("\n")
-    #        fw.write("====================================\n")
-
-    #fw.close()
-
-    import os
-    if not os.path.isdir("./data/comment-result"):
-        os.mkdir("./data/comment-result")
-    for name in os.listdir("./data/comment/"):
-        fw = codecs.open("./data/comment-result/"+name, "w", "utf-8")
-        with codecs.open("./data/comment/"+name, "r", "utf-8") as f:
-            for c in f.readlines():
-                if c.startswith(":::"):
-                    c = c.strip("\n").strip(":::")
-                    movieel = MovieEL(c, trie, m_e)
-                    movieel.db = db
-                    movieel.run()
-
-                    fw.write("comment:"+c)
-                    for q in movieel.queries:
-                        fw.write(q.text+"\t")
-                        for e in q.entities:
-                            print e.sim
-                            fw.write("%s,%s,%0.3f:::"%(e.id_, e.title, e.sim))
-                        fw.write("\n")
-                    fw.write("====================================\n")
-
-        fw.close()
-
-    with codecs.open("./data/评论2.txt", "r", "utf-8") as f:
+    with codecs.open("./data/评论1.txt", "r", "utf-8") as f:
         for c in f.readlines():
             c = c.strip("\n")
             movieel = MovieEL(c, trie, m_e)
             movieel.db = db
             movieel.run()
+
+            fw.write("comment:"+c)
+            fw.write("\n------------------------------------\n")
+            for q in movieel.queries:
+                if len(q.entities) > 0:
+                    for e in q.entities:
+                        print (q.text+"\t"+e.title+":"+str(e.sim))
+                        fw.write (q.text+"\t"+e.title+":"+str(e.sim)+"\n")
+                else: fw.write(q.text+"\n")
+            fw.write("====================================\n")
+
+    fw.close()
+
+    #import os
+    #if not os.path.isdir("./data/comment-result"):
+    #    os.mkdir("./data/comment-result")
+    #for name in os.listdir("./data/comment/"):
+    #    fw = codecs.open("./data/comment-result/"+name, "w", "utf-8")
+    #    with codecs.open("./data/comment/"+name, "r", "utf-8") as f:
+    #        for c in f.readlines():
+    #            if c.startswith(":::"):
+    #                c = c.strip("\n").strip(":::")
+    #                movieel = MovieEL(c, trie, m_e)
+    #                movieel.db = db
+    #                movieel.run()
+
+    #                fw.write("comment:"+c)
+    #                print ("Num of queries(mentions):%d"%len(movieel.queries))
+    #                for q in movieel.queries:
+    #                    fw.write(q.text+"\t")
+    #                    for e in q.entities:
+    #                        print (q.text+","+e.title+":"+str(e.sim))
+    #                        fw.write("%s,%s,%0.3f:::"%(e.id_, e.title, e.sim))
+    #                    fw.write("\n")
+    #                fw.write("====================================\n")
+
+    #    fw.close()
+
+    #with codecs.open("./data/评论2.txt", "r", "utf-8") as f:
+    #    for c in f.readlines():
+    #        c = c.strip("\n")
+    #        movieel = MovieEL(c, trie, m_e)
+    #        movieel.db = db
+    #        movieel.run()
     
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/env python
 #-*-coding:utf-8-*-
 
 import nltk
@@ -11,6 +11,19 @@ from collections import Counter
 
 from model.query import Query
 from db import *
+
+
+def normalize(d):
+    a = d.values()
+    n = len(a)
+    mean = sum(a) / n
+    std = math.sqrt(sum((x-mean)**2 for x in a) / n)
+
+    for k, v in d.items():
+        meanRemoved = v - mean #减去均值  
+        stded = meanRemoved / (std+1) #用标准差归一化  
+        d[k] = stded
+    return d
 
 ################# Strategy ####################
 def context_sim(mention, cans, doc, db, num=0, threshold=None):
@@ -53,6 +66,35 @@ def context_sim(mention, cans, doc, db, num=0, threshold=None):
 
     return c_sim
 
+
+def entity_cooccur(db, mention, mentions, cans, threshold=None):
+    """
+    """
+
+    c_sim = {}
+
+    for c in cans:
+        print ("Can ID:"+c)
+        es = db.get_prop_entities(c)
+        print ("    Entities in graph:")
+        print "    "+",".join(es)
+        if not es or len(es) == 0:
+            c_sim[c] = 0.0
+        else:
+            print ("    common: "+",".join(set(mentions)&set(es)))
+            c_sim[c] = len(set(mentions)&set(es))
+
+    for k,v in c_sim.items():
+        c_sim[k] = v*1.0/len(mentions)
+
+    #c_sim = normalize(c_sim)
+
+    if threshold:
+        for k,v in c_sim.items():
+            if v < threshold:
+                c_sim.pop(k)
+
+    return c_sim
 
 class Disambiguation():
 
