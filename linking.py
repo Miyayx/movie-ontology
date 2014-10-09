@@ -47,6 +47,9 @@ class MovieEL():
         return seg_index
     
     def extract_mentions(self):
+        """
+        Extract mentions from comment
+        """
         print ("comment:"+self.comment)
         segs = self.word_segmentation(self.comment)
     
@@ -138,51 +141,57 @@ if __name__=="__main__":
 
     db = MovieKB()
 
-    fw = codecs.open("data/comment1-result.dat","w",'utf-8')
+    #fw = codecs.open("data/comment1-result.dat","w",'utf-8')
+    #with codecs.open("./data/评论1.txt", "r", "utf-8") as f:
+    #    for c in f.readlines():
+    #        c = c.strip("\n")
+    #        movieel = MovieEL(c, trie, m_e)
+    #        movieel.db = db
+    #        movieel.run()
 
-    with codecs.open("./data/评论1.txt", "r", "utf-8") as f:
-        for c in f.readlines():
-            c = c.strip("\n")
-            movieel = MovieEL(c, trie, m_e)
-            movieel.db = db
-            movieel.run()
+    #        fw.write("comment:"+c)
+    #        fw.write("\n------------------------------------\n")
+    #        for q in movieel.queries:
+    #            if len(q.entities) > 0:
+    #                for e in q.entities:
+    #                    print (q.text+"\t"+e.title+":"+str(e.sim))
+    #                    fw.write (q.text+"\t"+e.title+":"+str(e.sim)+"\n")
+    #            else: fw.write(q.text+"\n")
+    #        fw.write("====================================\n")
 
-            fw.write("comment:"+c)
-            fw.write("\n------------------------------------\n")
-            for q in movieel.queries:
-                if len(q.entities) > 0:
-                    for e in q.entities:
-                        print (q.text+"\t"+e.title+":"+str(e.sim))
-                        fw.write (q.text+"\t"+e.title+":"+str(e.sim)+"\n")
-                else: fw.write(q.text+"\n")
-            fw.write("====================================\n")
+    #fw.close()
 
-    fw.close()
+    import os
+    if not os.path.isdir("./data/comment-result"):
+        os.mkdir("./data/comment-result")
+    for name in os.listdir("./data/comment/"):
+        fw = codecs.open("./data/comment-result/"+name, "w", "utf-8")
+        with codecs.open("./data/comment/"+name, "r", "utf-8") as f:
+            count = 0
+            for c in f.readlines():
+                if c.startswith(":::"):
+                    count += 1
 
-    #import os
-    #if not os.path.isdir("./data/comment-result"):
-    #    os.mkdir("./data/comment-result")
-    #for name in os.listdir("./data/comment/"):
-    #    fw = codecs.open("./data/comment-result/"+name, "w", "utf-8")
-    #    with codecs.open("./data/comment/"+name, "r", "utf-8") as f:
-    #        for c in f.readlines():
-    #            if c.startswith(":::"):
-    #                c = c.strip("\n").strip(":::")
-    #                movieel = MovieEL(c, trie, m_e)
-    #                movieel.db = db
-    #                movieel.run()
+                    c = c.strip("\n").strip(":::")
+                    movieel = MovieEL(c, trie, m_e)
+                    movieel.db = db
+                    movieel.run()
 
-    #                fw.write("comment:"+c)
-    #                print ("Num of queries(mentions):%d"%len(movieel.queries))
-    #                for q in movieel.queries:
-    #                    fw.write(q.text+"\t")
-    #                    for e in q.entities:
-    #                        print (q.text+","+e.title+":"+str(e.sim))
-    #                        fw.write("%s,%s,%0.3f:::"%(e.id_, e.title, e.sim))
-    #                    fw.write("\n")
-    #                fw.write("====================================\n")
+                    fw.write(str(count)+":::")
+                    print ("Num of queries(mentions):%d"%len(movieel.queries))
+                    for q in movieel.queries:
+                        
+                        if len(q.entities) > 0:
+                            for e in q.entities:
+                                print (q.text+","+e.title+":"+str(e.sim))
+                                fw.write("%d:::%s:::%d:::%d;;;%s:::%s:::%0.3f"%(count, q.text, q.index, q.index+len(q.text), e.uri, e.title, e.sim))
+                        else:
+                            fw.write("%d:::%s:::%d:::%d;;;"%(count, q.text, q.index, q.index+len(q.text)))
 
-    #    fw.close()
+                        fw.write("\n")
+                    fw.write("====================================\n")
+
+        fw.close()
 
     #with codecs.open("./data/评论2.txt", "r", "utf-8") as f:
     #    for c in f.readlines():
