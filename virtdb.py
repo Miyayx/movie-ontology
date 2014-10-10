@@ -33,6 +33,10 @@ class VirtDB(object):
     def query(self, sq):
         raise NotImplementedError("Subclasses should implement this!")
 
+    def close(self):
+        raise NotImplementedError("Subclasses should implement this!")
+
+
 
 class OdbcVirtDB(VirtDB):
     """
@@ -67,6 +71,9 @@ class OdbcVirtDB(VirtDB):
             self.db.close()
         return results
 
+    def close(self):
+        pass
+
 
 class JenaVirtDB(VirtDB):
     """
@@ -95,14 +102,14 @@ class JenaVirtDB(VirtDB):
             r_list.append((r.getK(), r.getV()))
         return r_list
 
-    def shutdown(self):
+    def close(self):
         shutdownJVM()
 
 if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
     configs.pop("driver")
     db = JenaVirtDB(**configs)
-    string = "select * where {<http://keg.tsinghua.edu.cn/movie/instance/" + str(11038951) + "> ?p"+" ?o}"
+    string = "select * where {<http://keg.tsinghua.edu.cn/movie/instance/" + str(11510446) + "> ?p"+" ?o}"
     for r in db.query(string):
         print r[0], r[1]
     

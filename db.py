@@ -10,6 +10,7 @@ from symbol import except_clause
 from virtdb import *
 
 PREFIX = 'http://keg.tsinghua.edu.cn/movie/'
+GRAPH = 'keg-movie2'
 
 class MovieKB():
     """
@@ -27,6 +28,9 @@ class MovieKB():
         else:
             configs.pop("driver")
             self.db = JenaVirtDB(**configs)
+
+    def close(self):
+        self.db.close()
 
     def fetch_one_result(self, sq):
         """
@@ -72,7 +76,7 @@ class MovieKB():
             k: shortcomming of property
             v: list of object
         """
-        sq = 'select * from <keg-movie> where {<%sinstance/%s> ?p ?o}'%(PREFIX,entity_id)
+        sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
         result_set = self.db.query(sq)
         result = {}
         for p, o in result_set:
@@ -174,8 +178,8 @@ class MovieKB():
 
 
     def get_abstract(self, entity_id):
-        #sq = 'select * from <keg-movie> where {<%sinstance/%s> <%scommon/summary> ?o }'%(PREFIX, entity_id, PREFIX)
-        sq = 'select * from <keg-movie> where {<%sinstance/%s> ?p ?o}'%(PREFIX,entity_id)
+        #sq = 'select * from <%s> where {<%sinstance/%s> <%scommon/summary> ?o }'%(GRAPH, PREFIX, entity_id, PREFIX)
+        sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
         result_set = self.db.query(sq)
         for p, o in result_set:
             if p.endswith('common/summary'):
@@ -184,15 +188,15 @@ class MovieKB():
         #return self.fetch_one_result(sq)
 
     def get_label(self, entity_id):
-        #sq = 'select * from <keg-movie> where {<%sinstance/%s> <%scommon/summary> ?o }'%(PREFIX, entity_id, PREFIX)
-        sq = 'select * from <keg-movie> where {<%sinstance/%s> ?p ?o}'%(PREFIX,entity_id)
+        #sq = 'select * from <%s> where {<%sinstance/%s> <%scommon/summary> ?o }'%(GRAPH, PREFIX, entity_id, PREFIX)
+        sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
         result_set = self.db.query(sq)
         for p, o in result_set:
             if p.endswith('label/zh'):
                 return o
 
     def get_concept_label(self, entity_id):
-        sq = 'select * from <keg-movie> where {<%sconcept/%s> ?p ?o}'%(PREFIX,entity_id)
+        sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
         result_set = self.db.query(sq)
         for p, o in result_set:
             if p.endswith('label/zh'):

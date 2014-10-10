@@ -49,6 +49,8 @@ class MovieEL():
     def extract_mentions(self):
         """
         Extract mentions from comment
+        正向最大匹配中文分词算法
+        http://hxraid.iteye.com/blog/667134
         """
         print ("comment:"+self.comment)
         segs = self.word_segmentation(self.comment)
@@ -59,12 +61,13 @@ class MovieEL():
             temp = []
             while True:
                 s = "".join([seg[0] for seg in segs[i:i+offset]])
-                if len(self.trie.keys(s)) > 0:# s is prefix or word 
-                    temp.append(s)
+                print s
+                if len(self.trie.keys(s)) > 0 and i+offset < len(segs):# s is prefix or word 
+                    temp.append(s) #把可能在tree里找到的都存起来,如： a, aa, aaa 
                     offset += 1
                 else: # not prefix or word, search end
                     if len(temp) > 0:
-                        temp.reverse()
+                        temp.reverse() #从最长的字符串开始查找，看是不是在tree里,如果有，就结束查找，生成Query，这部分的遍历就结束了,如：如果有aaa，那aaa就是要找的字符串，aa和a都不要
                         for t in temp:
                             if t in self.trie:
                                 self.queries.append(Query(t, segs[i][1]))
@@ -89,27 +92,28 @@ class MovieEL():
                 print ("candidate of " +q.text)
 
                 ######## context_sim ##########
-                #args = {
-                #        "mention" : q.text, 
-                #        "cans": cans, 
-                #        "doc" : self.comment,
-                #        "db"  : self.db,
-                #        "threshold":None
-                #        }
+                args = {
+                        "mention" : q.text, 
+                        "cans": cans, 
+                        "doc" : self.comment,
+                        "db"  : self.db,
+                        "threshold":None
+                        }
 
-                #d = Disambiguation(context_sim, args)
+                d = Disambiguation(context_sim, args)
 
                 ############# entity_cooccur ###########
                 args = {
                         "mentions":mentions,
                         "cans":cans,
                         "mention":q.text,
-                        "db":self.db,
-                        "threshold":0.3
+                        "db":self.db
+                        #"threshold":0.3
                         }
                 d = Disambiguation(entity_cooccur, args)
 
                 can_sim = d.get_sorted_cans(num=3) #top 3
+                can_sim = d.get_best() #top 3
 
                 for e_id, sim in can_sim:
                     le = self.db.create_littleentity(e_id)
@@ -132,41 +136,16 @@ def load_mention_entity(fn):
 
     return m_e
 
-
-if __name__=="__main__":
-    trie = marisa_trie.Trie()
-    trie.load('./data/m2e.trie')
-
-    m_e = load_mention_entity("./data/mention.entity")
+def test_run(in_dir, out_dir, fun=None):
 
     db = MovieKB()
 
-    #fw = codecs.open("data/comment1-result.dat","w",'utf-8')
-    #with codecs.open("./data/评论1.txt", "r", "utf-8") as f:
-    #    for c in f.readlines():
-    #        c = c.strip("\n")
-    #        movieel = MovieEL(c, trie, m_e)
-    #        movieel.db = db
-    #        movieel.run()
-
-    #        fw.write("comment:"+c)
-    #        fw.write("\n------------------------------------\n")
-    #        for q in movieel.queries:
-    #            if len(q.entities) > 0:
-    #                for e in q.entities:
-    #                    print (q.text+"\t"+e.title+":"+str(e.sim))
-    #                    fw.write (q.text+"\t"+e.title+":"+str(e.sim)+"\n")
-    #            else: fw.write(q.text+"\n")
-    #        fw.write("====================================\n")
-
-    #fw.close()
-
     import os
-    if not os.path.isdir("./data/comment-result"):
-        os.mkdir("./data/comment-result")
-    for name in os.listdir("./data/comment/"):
-        fw = codecs.open("./data/comment-result/"+name, "w", "utf-8")
-        with codecs.open("./data/comment/"+name, "r", "utf-8") as f:
+    if not os.path.isdir(out_dir):
+        os.mkdir(out_dir)
+    for name in os.listdir(in_dir):
+        fw = codecs.open(out_dir+name, "w", "utf-8")
+        with codecs.open(in_dir+name, "r", "utf-8") as f:
             count = 0
             for c in f.readlines():
                 if c.startswith(":::"):
@@ -177,10 +156,8 @@ if __name__=="__main__":
                     movieel.db = db
                     movieel.run()
 
-                    fw.write(str(count)+":::")
                     print ("Num of queries(mentions):%d"%len(movieel.queries))
                     for q in movieel.queries:
-                        
                         if len(q.entities) > 0:
                             for e in q.entities:
                                 print (q.text+","+e.title+":"+str(e.sim))
@@ -193,6 +170,39 @@ if __name__=="__main__":
 
         fw.close()
 
+    db.close()
+
+
+if __name__=="__main__":
+
+    trie = marisa_trie.Trie()
+    trie.load('./data/m2e.trie')
+
+    m_e = load_mention_entity("./data/mention.entity")
+
+    db = MovieKB()
+
+    fw = codecs.open("./data/test-sent/1.result","w",'utf-8')
+    with codecs.open("./data/test-sent/1","r","utf-8") as f:
+        for c in f.readlines():
+            c = c.strip("\n")
+            movieel = MovieEL(c, trie, m_e)
+            movieel.db = db
+            movieel.run()
+
+            fw.write("comment:"+c)
+            fw.write("\n------------------------------------\n")
+            for q in movieel.queries:
+                if len(q.entities) > 0:
+                    for e in q.entities:
+                        print (q.text+"\t"+e.title+":"+str(e.sim))
+                        fw.write (q.text+"\t"+e.title+":"+str(e.sim)+"\n")
+                else: fw.write(q.text+"\n")
+            fw.write("====================================\n")
+
+    fw.close()
+
+
     #with codecs.open("./data/评论2.txt", "r", "utf-8") as f:
     #    for c in f.readlines():
     #        c = c.strip("\n")
@@ -201,3 +211,6 @@ if __name__=="__main__":
     #        movieel.run()
     
 
+    #test_run("./data/comment","./data/comment-result")
+    #test_run("./data/test","./data/test-result")
+    #test_run("./data/test-sent","./data/test-sent-result")

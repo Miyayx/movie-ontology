@@ -85,6 +85,7 @@ def entity_cooccur(db, mention, mentions, cans, threshold=None):
             c_sim[c] = len(set(mentions)&set(es))
 
     for k,v in c_sim.items():
+        print (k+" "+str(v))
         c_sim[k] = v*1.0/len(mentions)
 
     #c_sim = normalize(c_sim)
@@ -110,7 +111,7 @@ class Disambiguation():
         c_sim = self.func(**self.args)
         best = max(c_sim.iteritems(), key=operator.itemgetter(1))
         print "best",best
-        best = set(best)
+        return [best]
 
     def get_sorted_cans(self, num=0):
         """
