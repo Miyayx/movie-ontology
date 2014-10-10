@@ -11,6 +11,11 @@ from model.little_entity import LittleEntity
 from disambiguation import *
 from db import *
 
+PUNCT = set(u''':!),.:;?]}¢'"、。〉》」』】〕〗〞︰︱︳﹐､﹒
+        ﹔﹕﹖﹗﹚﹜﹞！），．：；？｜｝︴︶︸︺︼︾﹀﹂﹄﹏､～￠
+        々‖•·ˇˉ―--′’”([{£¥'"‵〈《「『【〔〖（［｛￡￥〝︵︷︹︻
+        ︽︿﹁﹃﹙﹛﹝（｛“‘-—_…''')
+
 class MovieEL():
 
     def __init__(self, comment, trie, can_set):
@@ -40,6 +45,7 @@ class MovieEL():
         last = 0
         for seg in seg_list:
             seg = seg.strip("/")
+            #print re.split('(《》)', seg)[0]
             begin = s.index(seg, last)
             last = begin + len(seg)
             seg_index.append((seg, begin))
@@ -72,6 +78,8 @@ class MovieEL():
                             if t in self.trie:
                                 self.queries.append(Query(t, segs[i][1]))
                                 break
+                        if s[0] in PUNCT:
+                            offset = 1 #如果字符串的第一个字是标点，可能会影响匹配结果，跳过标点再匹配
                     break
             i += offset
     
