@@ -1,6 +1,5 @@
 #encoding=utf-8
 
-import MySQLdb
 import pyodbc
 import codecs
 
