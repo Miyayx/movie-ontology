@@ -1,0 +1,1 @@
+_virtodb = pyodbc.connect("DSN=%s;UID=dba;PWD=dba" %("VOS") )

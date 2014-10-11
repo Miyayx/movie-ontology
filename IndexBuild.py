@@ -22,6 +22,8 @@ def m2e_build(fin) :
         if len(pair)<2 :
             continue
         mention = pair[0]
+        if len(mention) < 2:
+            continue
         entity = pair[1]
 
         m2e[mention] = m2e.get(mention, []) + [entity]
@@ -44,8 +46,8 @@ if __name__ == '__main__':
     
     import time
     start = time.time()
-    m2e = m2e_build('./data/movie.mentions')
-    #save_m2e(m2e, './data/mention.entity')
+    m2e = m2e_build('./data/movie.mentions_new.mentions')
+    save_m2e(m2e, './data/mention.entity')
     trie = trie_build(m2e)
     trie.save('./data/m2e.trie')
     
