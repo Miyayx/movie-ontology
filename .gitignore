@@ -1,5 +1,4 @@
 #data/*
-config/
 nlpirpy/
 *.pyc
 
