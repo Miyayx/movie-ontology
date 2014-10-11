@@ -17,6 +17,8 @@ class MovieKB():
     --------------------------
     """
     
+    
+    
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
 #     print ("configs:"+configs)
     HOST = configs["host"]
@@ -27,7 +29,7 @@ class MovieKB():
 #     print ('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(DRIVER, HOST, PORT, UID, PWD))
 #     _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%('VOS',HOST, PORT, UID, PWD))
 #     _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(DRIVER, HOST, PORT, UID, PWD))
-    _virtodb = pyodbc.connect("DSN=VOS;UID=dba; PWD=dba;charset = utf-8"  )
+    _virtodb = pyodbc.connect("DSN=VOS;UID=dba; PWD=dba;CHARSET=UTF8"  )
     def __new__(cls, *args, **kwargs):
         if not cls._virtodb:
             cls._virtodb = super(MovieKB, cls).__new__(cls, *args, **kwargs)
@@ -133,15 +135,16 @@ class MovieKB():
 if __name__ == "__main__":
 #     mkb = MovieKB()
 #     mkb.get_abstract(11001038)
-    str_conn = "DSN=VOS;UID=dba; PWD=dba;charset = utf-8"
-    virto=pyodbc.connect(str_conn,unicode_results=True)
+    str_conn = "DSN=VOS;UID=dba;PWD=dba;CHARSET=utf16"
+    virto=pyodbc.connect(str_conn)
     cursor = virto.cursor()
-    entity_id = 11500032
+    entity_id = 11500030
     sq = 'sparql select * from <keg-movie> where {<%sinstance/%s> <%scommon/summary> ?o }'%(PREFIX, entity_id, PREFIX)
     results = cursor.execute(sq)
     try:
         result = results.fetchone()[0]
-        print(codecs.decode(result,'utf8'))
+        #print(result.encode('gbk','ignore').decode('UTF-8'))
+        print(result)
         if type(result) == tuple:
             result = result[0]
             print(result)
