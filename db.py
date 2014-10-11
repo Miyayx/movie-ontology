@@ -1,6 +1,5 @@
-#encoding=utf-8
+#-*-coding=utf-8-*-
 
-import MySQLdb
 import pyodbc
 import codecs
 
@@ -27,7 +26,9 @@ class MovieKB():
 #     print ('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(DRIVER, HOST, PORT, UID, PWD))
 #     _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%('VOS',HOST, PORT, UID, PWD))
 #     _virtodb = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s'%(DRIVER, HOST, PORT, UID, PWD))
-    _virtodb = pyodbc.connect("DSN=VOS;UID=dba; PWD=dba;charset = utf-8"  )
+    _virtodb = pyodbc.connect("DSN=VOS; UID=dba; PWD=dba; charset utf-8" 
+        )
+
     def __new__(cls, *args, **kwargs):
         if not cls._virtodb:
             cls._virtodb = super(MovieKB, cls).__new__(cls, *args, **kwargs)
@@ -133,18 +134,27 @@ class MovieKB():
 if __name__ == "__main__":
 #     mkb = MovieKB()
 #     mkb.get_abstract(11001038)
-    str_conn = "DSN=VOS;UID=dba; PWD=dba;charset = utf-8"
-    virto=pyodbc.connect(str_conn,unicode_results=True)
+    str_conn = "DSN=VOS;UID=dba;PWD=dba;CHARSET=UTF8"
+    virto=pyodbc.connect(str_conn)
     cursor = virto.cursor()
     entity_id = 11500032
     sq = 'sparql select * from <keg-movie> where {<%sinstance/%s> <%scommon/summary> ?o }'%(PREFIX, entity_id, PREFIX)
     results = cursor.execute(sq)
+    
     try:
         result = results.fetchone()[0]
-        print(codecs.decode(result,'utf8'))
+        #print (bytes(result,'gbk').decode("utf-8"))
+        #str(result,'utf-8')
+
+        #s = bytes(result[0])
+
+        #print(str(str(s).encode("ISO-8859-8")))
+        print (result)
+        print (s.decode("ISO-8859-8").encode("utf-8"))
+
         if type(result) == tuple:
             result = result[0]
-            print(result)
+            print(result.encode("utf-8"))
     except TypeError as e:
         print(e)
     finally:
