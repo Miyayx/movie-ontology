@@ -127,6 +127,10 @@ keg@Tsinghua
 Setting：
 
 ##Third-party package
+* JPype
+        [JPype](https://pypi.python.org/pypi/JPype1-py3)
+        [JPype-Windows-python3.4](https://pypi.python.org/packages/3.4/J/JPype1-py3/JPype1-py3-0.5.5.2.win-amd64-py3.4.exe#md5=b59007749ccc968fd6a944fa8610df48)
+
 * nltk 
 
     ```
