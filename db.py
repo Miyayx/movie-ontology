@@ -12,6 +12,7 @@ from virtdb import *
 PREFIX = 'http://keg.tsinghua.edu.cn/movie/'
 GRAPH = 'keg-movie2'
 SERVER_URL = 'http://localhost:5678/query'
+#SERVER_URL = 'http://10.1.1.23:5678/query'
 
 class MovieKB():
     """

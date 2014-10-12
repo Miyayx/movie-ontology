@@ -20,10 +20,11 @@ class VirtDB(object):
     """
     """
 
-    def __init__(self, uid, pwd, graph, dsn=None, host=None, port=None):
+    def __init__(self, uid, pwd, graph, dsn=None, driver=None, host=None, port=None):
         self.HOST = host
         self.PORT = port
         self.DSN = dsn 
+        self.DRIVER = driver
         self.UID = uid 
         self.PWD = pwd 
         self.GRAPH = graph
@@ -39,8 +40,8 @@ class VirtDB(object):
         raise NotImplementedError("Subclasses should implement this!")
 
 class HttpDB(VirtDB):
-    def __init__(self, url, uid, pwd, graph, host, port, prefix, dsn):
-        VirtDB.__init__(self, uid, pwd, graph, dsn, host, port)
+    def __init__(self, url, uid, pwd, graph, host, port, prefix, dsn, driver):
+        VirtDB.__init__(self, uid, pwd, graph, dsn, driver, host, port)
 
         self.url = url
         self.prefix = prefix
@@ -72,9 +73,8 @@ class HttpDB(VirtDB):
                 "pwd":self.PWD,
                 "host":self.HOST,
                 "port":self.PORT,
-                "dsn":"VOS2",
-                #"driver":"/usr/lib64/virtodbc_r.so"
-                "driver":"/usr/lib/odbc/virtodbc_r.so"
+                "dsn":self.DSN,
+                "driver":self.DRIVER
                 }
 
         f = urllib2.urlopen(urllib2.Request(self.url, urllib.urlencode(param)))
@@ -90,9 +90,7 @@ class OdbcVirtDB(VirtDB):
     """
 
     def __init__(self, uid, pwd, graph, dsn=None, host=None, port=None, driver=None):
-        VirtDB.__init__(self, uid, pwd, graph, dsn, host, port)
-
-        self.driver = driver
+        VirtDB.__init__(self, uid, pwd, graph, dsn, driver, host, port)
 
         self.db = None
 
@@ -102,11 +100,11 @@ class OdbcVirtDB(VirtDB):
     def query(self, sq):
         try:
             if self.DSN:
-                self.db = pyodbc.connect("DSN={Movie};HOST=%s:%s;UID=%s;PWD=%s;charset=%s"%(self.HOST, self.PORT, self.UID, self.PWD, self.charset) )
+                self.db = pyodbc.connect("DSN=%s;UID=%s;PWD=%s;charset=%s"%(self.DSN, self.UID, self.PWD, self.charset) )
         except Exception,e:
             print e
             if self.driver:
-                self.db = pyodbc.connect('DRIVER={VirtuosoODBC};HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'%(self.HOST, str(self.PORT), self.UID, self.PWD))
+                self.db = pyodbc.connect('DRIVER={%s};HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'%(self.DRIVER, self.HOST, str(self.PORT), self.UID, self.PWD))
             else:
                 raise ValueError("Need DSN or DRIVER&&HOST&&PORT")
 
