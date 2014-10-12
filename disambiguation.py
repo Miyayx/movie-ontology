@@ -45,8 +45,12 @@ def context_sim(mention, cans, doc, db, num=0, threshold=None):
                 seg_list = jieba.cut(a, cut_all=False)
                 a = " ".join(seg_list)
 
-                c_sim[c] = similarity(t, a)
-                print ("similarity:")
+                try:
+                    c_sim[c] = similarity(t, a)
+                except:
+                    c_sim[c] = 0.0
+
+
                 for k,v in c_sim.items():
                     print (k +' ' + str(v))
             else:
@@ -67,11 +71,13 @@ def context_sim(mention, cans, doc, db, num=0, threshold=None):
     return c_sim
 
 
-def entity_cooccur(db, mention, mentions, cans, threshold=None):
+def entity_cooccur(db, mention, mentions, context_mentions,cans, threshold=None):
     """
     """
 
     c_sim = {}
+    mentions = set(mentions)
+    context_mentions = set(context_mentions)
 
     for c in cans:
         print ("Can ID:"+c)
@@ -81,12 +87,13 @@ def entity_cooccur(db, mention, mentions, cans, threshold=None):
         if not es or len(es) == 0:
             c_sim[c] = 0.0
         else:
-            print ("    common: "+",".join(set(mentions)&set(es)))
-            c_sim[c] = len(set(mentions)&set(es))
+            print ("    common: "+",".join(set(context_mentions)&set(es)))
+            c_sim[c] = len(set(context_mentions)&set(es))
 
     for k,v in c_sim.items():
         print (k+" "+str(v))
-        c_sim[k] = v*1.0/len(mentions)
+        #c_sim[k] = v*1.0/len(mentions)
+        c_sim[k] = v*1.0/len(context_mentions)
 
     #c_sim = normalize(c_sim)
 
@@ -109,6 +116,8 @@ class Disambiguation():
     def get_best(self):
         import operator
         c_sim = self.func(**self.args)
+        if len(c_sim) == 0:
+            return {}
         best = max(c_sim.iteritems(), key=operator.itemgetter(1))
         print "best",best
         return [best]
