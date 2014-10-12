@@ -11,6 +11,7 @@ from virtdb import *
 
 PREFIX = 'http://keg.tsinghua.edu.cn/movie/'
 GRAPH = 'keg-movie2'
+SERVER_URL = 'http://localhost:5678/query'
 
 class MovieKB():
     """
@@ -22,14 +23,13 @@ class MovieKB():
         configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
         import sys
         if sys.platform == 'linux':
-            configs.pop("driver")
             #self.db = JenaVirtDB(**configs)
             #self.db = OdbcVirtDB(**configs)
             self.db = HttpDB(**configs)
         else:
-            configs.pop("driver")
             #self.db = JenaVirtDB(**configs)
             configs["prefix"] = PREFIX
+            configs["url"] = SERVER_URL
             self.db = HttpDB(**configs)
 
     def close(self):
@@ -229,5 +229,5 @@ class MovieKB():
 if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
     mkb = MovieKB()
-    mkb.get_prop_entities(12051504)
+    print mkb.get_prop_entities("b10050542")
 

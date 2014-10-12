@@ -47,7 +47,8 @@ class HttpDB(VirtDB):
     def connect(self):
         pass
 
-    def query(self, t, id_):
+    #def query(self, t, id_):
+    def query(self, sq):
         """
         request args need:
         id_
@@ -61,8 +62,9 @@ class HttpDB(VirtDB):
         """
 
         param = {
-                "id_":id_,
-                "type":t,
+                #"id_":id_,
+                #"type":t,
+                "sq":sq,
                 "prefix":self.prefix,
                 "graph":self.GRAPH,
                 "uid":self.UID,
@@ -75,7 +77,6 @@ class HttpDB(VirtDB):
 
         f = urllib2.urlopen(urllib2.Request(self.url, urllib.urlencode(param)))
         resp = f.read()
-        print json.loads(resp)
         return json.loads(resp)
 
     def close(self):
@@ -167,7 +168,6 @@ if __name__ == "__main__":
 
     db = HttpDB(**configs)
     for r in db.query("instance","b10050542"):
-        print r
         print (r[0]+" "+r[1])
         
 

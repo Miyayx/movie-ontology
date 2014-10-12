@@ -36,15 +36,15 @@ class VirtResource(Resource):
         args = dict((k,v[0]) for k,v in request.args.items())
         print "request args:",args
 
-        id_ = args["id_"]
-        type_ = args["type"]
-        
-        sq = 'select * from <%s> where {<%s/%s/%s> ?p ?o}'%(
-                args["graph"],
-                args.pop("prefix").strip("/"),
-                args.pop("type").strip("/"),
-                args.pop("id_")
-                )
+        #sq = 'select * from <%s> where {<%s/%s/%s> ?p ?o}'%(
+        #        args["graph"],
+        #        args.pop("prefix").strip("/"),
+        #        args.pop("type").strip("/"),
+        #        args.pop("id_")
+        #        )
+
+        sq = args.pop("sq")
+        args.pop("prefix")
 
         db = OdbcVirtDB(**args)
         results = db.query(sq)
