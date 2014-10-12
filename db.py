@@ -11,8 +11,8 @@ from virtdb import *
 
 PREFIX = 'http://keg.tsinghua.edu.cn/movie/'
 GRAPH = 'keg-movie2'
-SERVER_URL = 'http://localhost:5678/query'
-#SERVER_URL = 'http://10.1.1.23:5678/query'
+#SERVER_URL = 'http://localhost:5678/query'
+SERVER_URL = 'http://10.1.1.23:5678/query'
 
 class MovieKB():
     """
@@ -104,7 +104,7 @@ class MovieKB():
             获取instance地址下的label
             """
             s = set()
-            if d.has_key(p):
+            if p in d.keys():
                 for e in d[p]:#注意value是list形式的
                     if e.startswith("http"):
                         i = e.split("/")[-1]
@@ -122,7 +122,7 @@ class MovieKB():
             获取concept地址下的label
             """
             s = set()
-            if d.has_key(p):
+            if p in d.keys():
                 for e in d[p]: #注意value是list形式的
                     if e.startswith("http"):
                         i = e.split("/")[-1]
@@ -141,7 +141,7 @@ class MovieKB():
             """
             s = set()
             t = ""
-            if d.has_key(p):
+            if p in d.keys():
                 for string in d[p]:#注意value是list形式的
                     while True:
                         if "[[" in string and "]]" in string:
@@ -161,11 +161,11 @@ class MovieKB():
         #不能有label啊，不然肯定有共现的词
         #es.add(d["label/zh"][0])
 
-        if not d.has_key("label/zh"):
-            #连label都没有。。。扔掉！
+        if not "label/zh" in d.keys():
+        #连label都没有。。。扔掉！
             return es
-        
-        if d.has_key("alias"):
+  
+        if not "alias" in d.keys():
             es = es.union(set(d["alias"]))
         es = es.union(deep_concept(d, "instanceOf"))
         # For movie
@@ -230,5 +230,5 @@ class MovieKB():
 if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
     mkb = MovieKB()
-    print mkb.get_prop_entities("b10050542")
+    print (mkb.get_prop_entities("b10050542"))
 

@@ -11,7 +11,14 @@ if not re.match('linux',sys.platform):
     from jpype import *
 
 import urllib 
-import urllib2 
+if sys.version[0] == '3':
+    import urllib.request as urllib2
+    from urllib.parse import urlencode
+    
+else: 
+    import urllib2
+    from urllib import urlencode 
+
 import json
 
 from utils import *
@@ -77,9 +84,9 @@ class HttpDB(VirtDB):
                 "driver":self.DRIVER
                 }
 
-        f = urllib2.urlopen(urllib2.Request(self.url, urllib.urlencode(param)))
+        f = urllib2.urlopen(urllib2.Request(self.url, urlencode(param).encode('utf-8')))
         resp = f.read()
-        return json.loads(resp)
+        return json.loads(resp.decode('utf-8'))
 
     def close(self):
         pass
@@ -101,8 +108,8 @@ class OdbcVirtDB(VirtDB):
         try:
             if self.DSN:
                 self.db = pyodbc.connect("DSN=%s;UID=%s;PWD=%s;charset=%s"%(self.DSN, self.UID, self.PWD, self.charset) )
-        except Exception,e:
-            print e
+        except Exception as e:
+            print (e)
             if self.driver:
                 self.db = pyodbc.connect('DRIVER={%s};HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'%(self.DRIVER, self.HOST, str(self.PORT), self.UID, self.PWD))
             else:
@@ -159,18 +166,19 @@ class JenaVirtDB(VirtDB):
 
 if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
-    string = "select * where {<http://keg.tsinghua.edu.cn/movie/instance/" + str(11510446) + "> ?p"+" ?o}"
+    string = "select * where {<http://keg.tsinghua.edu.cn/movie/instance/" + str('b10050542') + "> ?p"+" ?o}"
 
     #db = JenaVirtDB(**configs)
-    #for r in db.query(string):
-    #    print (r[0]+" "+r[1])
 
-    configs["url"] = "http://localhost:5678/query"
+    configs["url"] = "http://10.1.1.23:5678/query"
     configs["prefix"] = 'http://keg.tsinghua.edu.cn/movie/'
 
     db = HttpDB(**configs)
-    for r in db.query("instance","b10050542"):
+    for r in db.query(string):
         print (r[0]+" "+r[1])
+    
+    #for r in db.query("instance","b10050542"):
+    #    print (r[0]+" "+r[1])
         
 
     
