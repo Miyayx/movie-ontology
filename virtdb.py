@@ -137,7 +137,7 @@ class JenaVirtDB(VirtDB):
             raise ValueError("Need Value:PORT")
         VirtDB.__init__(self, uid, pwd, graph, host=host, port=port)
 
-        self.jvmpath = getDefaultJVMPath()
+        #self.jvmpath = getDefaultJVMPath()
         #startJVM(self.jvmpath, "-ea", "-Djava.ext.dirs={0}".format(os.path.abspath('.')+"/java/"))
         startJVM("C:/Program Files/Java/jre7/bin/server/jvm.dll","-ea","-Djava.ext.dirs={0}".format(os.path.abspath('.')+"/java/"))
         print ("JVM Start")
