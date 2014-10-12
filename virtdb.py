@@ -71,7 +71,7 @@ class HttpDB(VirtDB):
                 "pwd":self.PWD,
                 "host":self.HOST,
                 "port":self.PORT,
-                #"dsn":"VOS",
+                "dsn":"VOS",
                 "driver":"/usr/lib64/virtodbc_r.so"
                 }
 
@@ -98,13 +98,14 @@ class OdbcVirtDB(VirtDB):
         pass
 
     def query(self, sq):
-        if self.DSN:
-            self.db = pyodbc.connect("HOST=%s; PORT=%s; DSN=%s; UID=%s; PWD=%s;charset=%s"%(self.HOST, self.PORT, self.DSN, self.UID, self.PWD, self.charset) )
-
-        elif self.driver:
-            self.db = pyodbc.connect('DRIVER=%s;HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'%(self.driver, self.HOST, str(self.PORT), self.UID, self.PWD))
-        #else:
-        #    raise ValueError("Need DSN or DRIVER&&HOST&&PORT")
+        try:
+            if self.DSN:
+                self.db = pyodbc.connect("HOST=%s; PORT=%s; DSN=%s; UID=%s; PWD=%s;charset=%s"%(self.HOST, self.PORT, self.DSN, self.UID, self.PWD, self.charset) )
+        except:
+            if self.driver:
+                self.db = pyodbc.connect('DRIVER=%s;HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'%(self.driver, self.HOST, str(self.PORT), self.UID, self.PWD))
+            else:
+                raise ValueError("Need DSN or DRIVER&&HOST&&PORT")
 
         sq = "sparql " + sq
         cursor = self.db.cursor()
