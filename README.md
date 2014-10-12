@@ -42,6 +42,14 @@ keg@Tsinghua
 * Windows 
     > download [pyodbc](http://www.lfd.uci.edu/~gohlke/pythonlibs/#pyodbc)
 
+* Add db DSN in /etc/odbcinst.ini
+    ```
+    [VOS]
+    Description     = Virtuoso
+    Driver          = /usr/lib64/virtodbc_r.so(your virtuoso driver path)
+    Driver64        = /usr/lib64/virtodbc_r.so
+    UserName        = dba
+    ```
 
 Setting：
 

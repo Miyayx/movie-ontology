@@ -9,7 +9,9 @@ import sys
 import pyodbc
 import codecs
 
-from urllib import *
+import urllib 
+import urllib2 
+import json
 
 from utils import *
 
@@ -35,6 +37,49 @@ class VirtDB(object):
     def close(self):
         raise NotImplementedError("Subclasses should implement this!")
 
+class HttpDB(VirtDB):
+    def __init__(self, url, uid, pwd, graph, host, port, prefix, dsn):
+        VirtDB.__init__(self, uid, pwd, graph, dsn, host, port)
+
+        self.url = url
+        self.prefix = prefix
+
+    def connect(self):
+        pass
+
+    def query(self, t, id_):
+        """
+        request args need:
+        id_
+        type
+        prefix
+        graph
+        host
+        port
+        uid
+        pwd
+        """
+
+        param = {
+                "id_":id_,
+                "type":t,
+                "prefix":self.prefix,
+                "graph":self.GRAPH,
+                "uid":self.UID,
+                "pwd":self.PWD,
+                "host":self.HOST,
+                "port":self.PORT,
+                #"dsn":"VOS",
+                "driver":"/usr/lib64/virtodbc_r.so"
+                }
+
+        f = urllib2.urlopen(urllib2.Request(self.url, urllib.urlencode(param)))
+        resp = f.read()
+        print json.loads(resp)
+        return json.loads(resp)
+
+    def close(self):
+        pass
 
 
 class OdbcVirtDB(VirtDB):
@@ -42,7 +87,9 @@ class OdbcVirtDB(VirtDB):
     """
 
     def __init__(self, uid, pwd, graph, dsn=None, host=None, port=None, driver=None):
-        virtDB.__init__(self, uid, pwd, graph, dsn, host, port)
+        VirtDB.__init__(self, uid, pwd, graph, dsn, host, port)
+
+        self.driver = driver
 
         self.db = None
 
@@ -51,18 +98,20 @@ class OdbcVirtDB(VirtDB):
 
     def query(self, sq):
         if self.DSN:
-            self.db = pyodbc.connect("DSN=%s; UID=%s; PWD=%s;charset=%s"%(self.DSN, self.UID, self.PWD, self.charset) )
-        elif self.DRIVER:
-            self.db = pyodbc.connect('DRIVER=%s;HOST=%s:%d;UID=%s;PWD=%s;charset=UTF-8'%(DRIVER, HOST, PORT, UID, PWD))
-        else:
-            raise ValueError("Need DSN or DRIVER&&HOST&&PORT")
+            self.db = pyodbc.connect("HOST=%s; PORT=%s; DSN=%s; UID=%s; PWD=%s;charset=%s"%(self.HOST, self.PORT, self.DSN, self.UID, self.PWD, self.charset) )
+
+        elif self.driver:
+            self.db = pyodbc.connect('DRIVER=%s;HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'%(self.driver, self.HOST, str(self.PORT), self.UID, self.PWD))
+        #else:
+        #    raise ValueError("Need DSN or DRIVER&&HOST&&PORT")
 
         sq = "sparql " + sq
-        cursor = self._virtodb.cursor()
+        cursor = self.db.cursor()
+        print ("Query:%s"%sq)
         try:
-            results = [r[0] for r in cursor.execute(sq).fetchall()]
-            if results and len(results) > 0 and type(results[0]) == tuple:
-                results = [r[0] for r in results]
+            results = [(r[0][0], r[1][0]) for r in cursor.execute(sq).fetchall()]
+            #if results and len(results) > 0 and type(results[0]) == tuple:
+            #    results = [r[0] for r in results]
         except TypeError:
             return []
         finally:
@@ -98,7 +147,6 @@ class JenaVirtDB(VirtDB):
     def query(self, sq):
         r_list = []
         result = self.db.query(sq)
-        print (result)
         for r in result:
             r_list.append((r.getK(), r.getV()))
         return r_list
@@ -108,11 +156,20 @@ class JenaVirtDB(VirtDB):
 
 if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
-    configs.pop("driver")
-    db = JenaVirtDB(**configs)
     string = "select * where {<http://keg.tsinghua.edu.cn/movie/instance/" + str(11510446) + "> ?p"+" ?o}"
-    print (string)
-    for r in db.query(string):
+
+    #db = JenaVirtDB(**configs)
+    #for r in db.query(string):
+    #    print (r[0]+" "+r[1])
+
+    configs["url"] = "http://localhost:5678/query"
+    configs["prefix"] = 'http://keg.tsinghua.edu.cn/movie/'
+
+    db = HttpDB(**configs)
+    for r in db.query("instance","b10050542"):
+        print r
         print (r[0]+" "+r[1])
+        
+
     
 

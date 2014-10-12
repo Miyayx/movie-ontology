@@ -1,6 +1,5 @@
-
 #!/usr/bin/env python
-#-*-coding=utf-8-*-
+#-*-coding:utf-8-*-
 
 import pyodbc
 import codecs
@@ -24,11 +23,14 @@ class MovieKB():
         import sys
         if sys.platform == 'linux':
             configs.pop("driver")
-            self.db = JenaVirtDB(**configs)
+            #self.db = JenaVirtDB(**configs)
             #self.db = OdbcVirtDB(**configs)
+            self.db = HttpDB(**configs)
         else:
             configs.pop("driver")
-            self.db = JenaVirtDB(**configs)
+            #self.db = JenaVirtDB(**configs)
+            configs["prefix"] = PREFIX
+            self.db = HttpDB(**configs)
 
     def close(self):
         self.db.close()
