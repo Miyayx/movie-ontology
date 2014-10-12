@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 #-*-coding=utf-8-*-
-
-from jpype import *
-
 import os
 import sys
+import re
 
 import pyodbc
 import codecs
+
+if not re.match('linux',sys.platform):
+    from jpype import *
 
 import urllib 
 import urllib2 
@@ -71,8 +72,9 @@ class HttpDB(VirtDB):
                 "pwd":self.PWD,
                 "host":self.HOST,
                 "port":self.PORT,
-                "dsn":"VOS",
-                "driver":"/usr/lib64/virtodbc_r.so"
+                "dsn":"VOS2",
+                #"driver":"/usr/lib64/virtodbc_r.so"
+                "driver":"/usr/lib/odbc/virtodbc_r.so"
                 }
 
         f = urllib2.urlopen(urllib2.Request(self.url, urllib.urlencode(param)))
@@ -100,10 +102,11 @@ class OdbcVirtDB(VirtDB):
     def query(self, sq):
         try:
             if self.DSN:
-                self.db = pyodbc.connect("HOST=%s; PORT=%s; DSN=%s; UID=%s; PWD=%s;charset=%s"%(self.HOST, self.PORT, self.DSN, self.UID, self.PWD, self.charset) )
-        except:
+                self.db = pyodbc.connect("DSN={Movie};HOST=%s:%s;UID=%s;PWD=%s;charset=%s"%(self.HOST, self.PORT, self.UID, self.PWD, self.charset) )
+        except Exception,e:
+            print e
             if self.driver:
-                self.db = pyodbc.connect('DRIVER=%s;HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'%(self.driver, self.HOST, str(self.PORT), self.UID, self.PWD))
+                self.db = pyodbc.connect('DRIVER={VirtuosoODBC};HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'%(self.HOST, str(self.PORT), self.UID, self.PWD))
             else:
                 raise ValueError("Need DSN or DRIVER&&HOST&&PORT")
 
