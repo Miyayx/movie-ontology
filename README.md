@@ -55,8 +55,15 @@ keg@Tsinghua
     [Movie]
     Drvier         = VirtuosoODBC
     Drvier64       = VirtuosoODBC
-    Servername     = XXX.XXX.XXX.XXX
-    Port           = 1111
+    Address        = XXX.XXX.XXX.XXX:1111
+
+    Servername and Port seem no use
+    ```
+
+    ```
+    pyodbc.connect("DSN=%s;UID=%s;PWD=%s;charset=%s"%(self.DSN, self.UID, self.PWD, self.charset) )
+    or
+    pyodbc.connect('DRIVER={%s};HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'%(self.driver, self.HOST, str(self.PORT), self.UID, self.PWD))
     ```
 
 
