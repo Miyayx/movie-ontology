@@ -1,0 +1,12 @@
+有幸参加了《中国合伙人||11001038》提前观影会，看了片儿，见了陈可辛||11005617，还提了问题拿了签名海报。喜欢片里佟大为||11038951扮演的王阳，失恋之后，黄晓明||11026177在阳台上为他剪去一头长发的场景印象极深，王阳的痛哭是对一个时代的告别，一个充满着诗意浪漫与理想主义的年代自此戛然而止。
+
+<http://keg.tsinghua.edu.cn/movie/instance/11500032>
+
+http://10.1.1.189:8890/conductor
+dba/dba
+
+select * from <keg-movie> where{<http://keg.tsinghua.edu.cn/movie/instance/11500032> ?p ?o}  
+
+select * from <keg-movie> where{?s <http://keg.tsinghua.edu.cn/movie/common/alias> ?o}  别名
+<http://keg.tsinghua.edu.cn/movie/object/label/zh>  title
+<http://keg.tsinghua.edu.cn/movie/common/summary>   abstract

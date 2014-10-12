@@ -6,7 +6,6 @@ from jpype import *
 import os
 import sys
 
-import MySQLdb
 import pyodbc
 import codecs
 
@@ -87,8 +86,9 @@ class JenaVirtDB(VirtDB):
         VirtDB.__init__(self, uid, pwd, graph, host=host, port=port)
 
         self.jvmpath = getDefaultJVMPath()
-        startJVM(self.jvmpath, "-ea", "-Djava.ext.dirs="+os.path.abspath('.')+"/java/")
-        print "JVM Start"
+        #startJVM(self.jvmpath, "-ea", "-Djava.ext.dirs={0}".format(os.path.abspath('.')+"/java/"))
+        startJVM("C:/Program Files/Java/jre7/bin/server/jvm.dll","-ea","-Djava.ext.dirs={0}".format(os.path.abspath('.')+"/java/"))
+        print ("JVM Start")
         VtsDB = JClass('movie.MovieVirt')
         self.db = VtsDB(host, port, uid, pwd, graph)
 
@@ -98,6 +98,7 @@ class JenaVirtDB(VirtDB):
     def query(self, sq):
         r_list = []
         result = self.db.query(sq)
+        print (result)
         for r in result:
             r_list.append((r.getK(), r.getV()))
         return r_list
@@ -110,7 +111,8 @@ if __name__ == "__main__":
     configs.pop("driver")
     db = JenaVirtDB(**configs)
     string = "select * where {<http://keg.tsinghua.edu.cn/movie/instance/" + str(11510446) + "> ?p"+" ?o}"
+    print (string)
     for r in db.query(string):
-        print r[0], r[1]
+        print (r[0]+" "+r[1])
     
 

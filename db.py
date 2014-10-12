@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 #-*-coding=utf-8-*-
 
@@ -227,5 +228,4 @@ if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
     mkb = MovieKB()
     mkb.get_prop_entities(12051504)
-
 

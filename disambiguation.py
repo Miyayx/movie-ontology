@@ -83,7 +83,7 @@ def entity_cooccur(db, mention, mentions, context_mentions,cans, threshold=None)
         print ("Can ID:"+c)
         es = db.get_prop_entities(c)
         print ("    Entities in graph:")
-        print "    "+",".join(es)
+        print ("    "+",".join(es))
         if not es or len(es) == 0:
             c_sim[c] = 0.0
         else:
@@ -119,7 +119,6 @@ class Disambiguation():
         if len(c_sim) == 0:
             return {}
         best = max(c_sim.iteritems(), key=operator.itemgetter(1))
-        print "best",best
         return [best]
 
     def get_sorted_cans(self, num=0):

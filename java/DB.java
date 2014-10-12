@@ -39,7 +39,7 @@ public class DB {
 		String res = "";
 		int count = 0;
 		ResultSet results = vqe.execSelect();
-		while (results.hasNext()) {
+		while (results.hasNext()) {							
 			QuerySolution result = results.nextSolution();
 			RDFNode s = result.get("o");
 			res = s.toString();
