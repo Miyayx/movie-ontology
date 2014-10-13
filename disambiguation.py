@@ -98,9 +98,10 @@ def entity_cooccur(db, mention, mentions, context_mentions,cans, threshold=None)
     #c_sim = normalize(c_sim)
 
     if threshold:
-        for k,v in c_sim.items():
+        for k,v in list(c_sim.items()):
             if v < threshold:
                 c_sim.pop(k)
+
 
     return c_sim
 
@@ -118,7 +119,7 @@ class Disambiguation():
         c_sim = self.func(**self.args)
         if len(c_sim) == 0:
             return {}
-        best = max(c_sim.iteritems(), key=operator.itemgetter(1))
+        best = max(c_sim.items(), key=operator.itemgetter(1))
         return [best]
 
     def get_sorted_cans(self, num=0):

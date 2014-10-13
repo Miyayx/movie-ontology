@@ -165,7 +165,7 @@ class MovieKB():
         #连label都没有。。。扔掉！
             return es
   
-        if not "alias" in d.keys():
+        if "alias" in d.keys():
             es = es.union(set(d["alias"]))
         es = es.union(deep_concept(d, "instanceOf"))
         # For movie
@@ -218,11 +218,14 @@ class MovieKB():
         d = self.parse_properties(q_result)
 
         entity["title"] = d["label/zh"][0]
-        if d.has_key("alias"):
+#         if d.has_key("alias"):
+        if "alias" in d:
             entity["alias"] = d["alias"]
-        if d.has_key("summary"):
+#         if d.has_key("summary"):
+        if "summary" in d:
             entity["abstract"] = d["summary"][0]
-        if d.has_key("firstimage"):
+#         if d.has_key("firstimage"):
+        if "firstimage" in d:
             entity["image"] = d["firstimage"][0]
 
         return entity
@@ -230,5 +233,5 @@ class MovieKB():
 if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
     mkb = MovieKB()
-    print (mkb.get_prop_entities("b10050542"))
+    print (mkb.get_prop_entities("b10050543"))
 

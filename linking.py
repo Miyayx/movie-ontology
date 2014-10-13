@@ -117,29 +117,29 @@ class MovieEL():
                 print ("candidate of " +q.text)
 
                 ####### context_sim ##########
-                args = {
-                        "mention" : q.text, 
-                        "cans": cans, 
-                        "doc" : self.comment,
-                        "db"  : self.db,
-                        "threshold":None
-                        }
-
-                d = Disambiguation(context_sim, args)
+#                 args = {
+#                         "mention" : q.text, 
+#                         "cans": cans, 
+#                         "doc" : self.comment,
+#                         "db"  : self.db,
+#                         "threshold":None
+#                         }
+# 
+#                 d = Disambiguation(context_sim, args)
 
                 ############# entity_cooccur ###########
-                #args = {
-                #        "context_mentions":con_mens,
-                #        "mentions":mentions,
-                #        "cans":cans,
-                #        "mention":q.text,
-                #        "db":self.db,
-                #        "threshold":0.01
-                #        }
-                #d = Disambiguation(entity_cooccur, args)
-
-                #can_sim = d.get_sorted_cans(num=3) #top 3
-                can_sim = d.get_best() #top 3
+                args = {
+                        "context_mentions":con_mens,
+                        "mentions":mentions,
+                        "cans":cans,
+                        "mention":q.text,
+                        "db":self.db,
+                        "threshold":0.01
+                        }
+                d = Disambiguation(entity_cooccur, args)
+ 
+                can_sim = d.get_sorted_cans(num=3) #top 3
+#                 can_sim = d.get_best() #top 3
 
                 for e_id, sim in can_sim:
                     le = self.db.create_littleentity(e_id)
