@@ -313,19 +313,104 @@ class MovieKB():
     def getUriByName(self,name):
         sq = """
             select * from <keg-movie2> where {
-             {?s  <http://keg.tsinghua.edu.cn/movie/object/label/zh> "%s"}
-                 union
-             {?s  <http://keg.tsinghua.edu.cn/movie/common/alias> "%s"}
+             {?s  <http://keg.tsinghua.edu.cn/movie/object/label/zh> "%s"} union {?s  <http://keg.tsinghua.edu.cn/movie/common/alias> "%s"}
             }
             """%(name,name)
         result_set = self.db.query(sq)
         return [x[0] for x in result_set]
 
+    #导演 演员 合作 作品  冯小刚 葛优
+    def works_by_actor_director(self,aname="葛优",dname="冯小刚"):
+        sq = """
+            select ?m  ?o from <keg-movie2> where {
+                {?fxg <http://keg.tsinghua.edu.cn/movie/common/alias> "%s".} union {?fxg <http://keg.tsinghua.edu.cn/movie/object/label/zh> "%s".}
+                {?gy  <http://keg.tsinghua.edu.cn/movie/common/alias> "%s".} union {?fxg <http://keg.tsinghua.edu.cn/movie/object/label/zh> "%s".}
+                ?s <http://keg.tsinghua.edu.cn/movie/blanknode/actor_id> ?gy.
+                ?m <http://keg.tsinghua.edu.cn/movie/actor_list> ?s.
+                ?m <http://keg.tsinghua.edu.cn/movie/directed_by> ?fxg.
+                ?m <http://keg.tsinghua.edu.cn/movie/object/label/zh> ?o }
+        """%(dname,dname,aname,aname)
+        #result_set = self.db.query(sq)
+        #return [{"id":m[0],"name":o[0]} for m,o in result_set]
+        return sq
+
+    #n年 演员a 演员b 合演作品
+    def works_by_actors(self,aname1="星爷",aname2="达叔",year="91"):
+        sq = """
+            select ?m  ?o from <keg-movie2> where {
+                {?zxc <http://keg.tsinghua.edu.cn/movie/common/alias> "%s".} union {?zxc <http://keg.tsinghua.edu.cn/movie/object/label/zh> "%s".}
+                {?wmd  <http://keg.tsinghua.edu.cn/movie/common/alias> "%s".} union {?wmd <http://keg.tsinghua.edu.cn/movie/object/label/zh> "%s".}
+                ?s1 <http://keg.tsinghua.edu.cn/movie/blanknode/actor_id> ?zxc.
+                ?s2 <http://keg.tsinghua.edu.cn/movie/blanknode/actor_id> ?wmd.
+                ?m <http://keg.tsinghua.edu.cn/movie/actor_list> ?s1.
+                ?m <http://keg.tsinghua.edu.cn/movie/actor_list> ?s2.
+                ?m <http://keg.tsinghua.edu.cn/movie/object/label/zh> ?o.
+                {?m <http://keg.tsinghua.edu.cn/movie/tv/original_air_date> ?o} union {?m <http://keg.tsinghua.edu.cn/movie/initial_release_date> ?o}
+                FILTER regex(?y, "%s", "i"
+                }
+            """%(aname1,aname1,aname2,aname2,year)
+        #result_set = self.db.query(sq)
+        #return [{"id":m[0],"name":o[0]} for m,o in result_set]
+        return sq
+
+    #作品的主演 及其 配偶
+    def semantic_search_ex1(self,name="天下无贼"):
+        sq = """
+            select ?n ?z from <keg-movie2> where {
+               {?s <http://keg.tsinghua.edu.cn/movie/common/alias> "%s".} union {?s <http://keg.tsinghua.edu.cn/movie/object/label/zh> "%s".}
+                ?s <http://keg.tsinghua.edu.cn/movie/actor_list> ?ab.
+                ?ab <http://keg.tsinghua.edu.cn/movie/blanknode/actor_name> ?n.
+                ?ab <http://keg.tsinghua.edu.cn/movie/blanknode/actor_id> ?a.
+                optional {?a <http://keg.tsinghua.edu.cn/movie/people/spouse/zh> ?z.} }
+            """%(name,name)
+       '''
+       result_set = self.db.query(sq)
+        result = []
+        for m,o in result_set:
+            e = {}
+            e['演员']=m
+            if o is not None: e['配偶']=o
+            result.append(e)
+        return result
+        '''
+        return sq
+
+    #tvb旗下 香港出生 汉族 男 艺人
+    def semantic_search_ex2(self):
+        sq = """
+          select ?n ?o ?nt ?p ?g from <keg-movie2> where {
+            {?m <http://keg.tsinghua.edu.cn/movie/organization/company> ?o .   FILTER regex(?o, "香港无线", "i")} union
+            {?m <http://keg.tsinghua.edu.cn/movie/organization/company> ?o .   FILTER regex(?o, "tvb", "i")} union
+            {?m <http://keg.tsinghua.edu.cn/movie/organization/company> ?o .   FILTER regex(?o, "电视广播有限", "i")} union
+            {?m <http://keg.tsinghua.edu.cn/movie/tv/produced_by_company> <http://keg.tsinghua.edu.cn/movie/instance/b10000001>.}
+            ?m <http://keg.tsinghua.edu.cn/movie/object/label/zh> ?n.
+            ?m <http://keg.tsinghua.edu.cn/movie/people/nationality> ?nt.
+            ?m <http://keg.tsinghua.edu.cn/movie/people/birthplace> ?p.
+            ?m <http://keg.tsinghua.edu.cn/movie/people/gender/zh> ?g.
+            FILTER regex(?g, "男", "i")
+            FILTER regex(?nt, "汉", "i")
+            FILTER regex(?p, "香港", "i")
+        }"""
+        '''
+        result_set = self.db.query(sq)
+        result = []
+        for name,company,nation,bplace,gender in result_set:
+            e = {}
+            e['名称']=name
+            e['公司']=company
+            e['民族']=nation
+            e['出生地']=bplace
+            e['性别']=gender
+            result.append(e)
+        return result
+        '''
+        return sq
+
 if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
     mkb = MovieKB()
     #print mkb.get_prop_entities("b10050542")
-    print mkb.getUriByName("冯小刚")
+    #print mkb.getUriByName("冯小刚")
     #fw = codecs.open('test.txt','w','utf-8')
     #fw.write(json.dumps(mkb.get_entity_info("b10000001"),ensure_ascii=False))
     #fw.close()
