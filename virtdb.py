@@ -4,8 +4,6 @@ import os
 import sys
 import re
 
-import pyodbc
-import codecs
 
 if not re.match('linux',sys.platform):
     from jpype import *
@@ -13,6 +11,7 @@ if not re.match('linux',sys.platform):
 import urllib
 import urllib2
 import json
+import pyodbc
 
 from utils import *
 
@@ -20,7 +19,8 @@ class VirtDB(object):
     """
     """
 
-    def __init__(self, uid, pwd, graph, dsn=None, driver=None, host=None, port=None):
+    def __init__(self, uid, pwd, graph, dsn=None,
+                 driver=None, host=None, port=None):
         self.HOST = host
         self.PORT = port
         self.DSN = dsn
@@ -28,7 +28,7 @@ class VirtDB(object):
         self.UID = uid
         self.PWD = pwd
         self.GRAPH = graph
-        self.charset="UTF-8"
+        self.charset = "UTF-8"
 
     def connect(self):
         raise NotImplementedError("Subclasses should implement this!")
@@ -64,17 +64,17 @@ class HttpDB(VirtDB):
         """
 
         param = {
-                #"id_":id_,
-                #"type":t,
-                "sq":sq,
-                "prefix":self.prefix,
-                "graph":self.GRAPH,
-                "uid":self.UID,
-                "pwd":self.PWD,
-                "host":self.HOST,
-                "port":self.PORT,
-                "dsn":self.DSN,
-                "driver":self.DRIVER
+                # "id_":id_,
+                # "type":t,
+                "sq": sq,
+                "prefix": self.prefix,
+                "graph": self.GRAPH,
+                "uid": self.UID,
+                "pwd": self.PWD,
+                "host": self.HOST,
+                "port": self.PORT,
+                "dsn": self.DSN,
+                "driver": self.DRIVER
                 }
 
         f = urllib2.urlopen(urllib2.Request(self.url, urllib.urlencode(param)))
@@ -93,6 +93,7 @@ class OdbcVirtDB(VirtDB):
         VirtDB.__init__(self, uid, pwd, graph, dsn, driver, host, port)
 
         self.db = None
+        self.driver = driver
 
     def connect(self):
         pass
@@ -100,11 +101,12 @@ class OdbcVirtDB(VirtDB):
     def query(self, sq):
         try:
             if self.DSN:
-                self.db = pyodbc.connect("DSN=%s;UID=%s;PWD=%s;charset=%s"%(self.DSN, self.UID, self.PWD, self.charset) )
+                self.db = pyodbc.connect("DSN=%s;UID=%s;PWD=%s;charset=%s"%(self.DSN, self.UID, self.PWD, self.charset))
         except Exception,e:
             print e
             if self.driver:
-                self.db = pyodbc.connect('DRIVER={%s};HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'%(self.DRIVER, self.HOST, str(self.PORT), self.UID, self.PWD))
+                self.db = pyodbc.connect('DRIVER={%s};HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'
+                                         %(self.DRIVER, self.HOST, str(self.PORT), self.UID, self.PWD))
             else:
                 raise ValueError("Need DSN or DRIVER&&HOST&&PORT")
 
@@ -204,7 +206,4 @@ if __name__ == "__main__":
     #db = HttpDB(**configs)
     #for r in db.query("instance","b10050542"):
        # print (r[0]+" "+r[1])
-
-
-
 
