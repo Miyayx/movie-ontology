@@ -3,6 +3,7 @@
 
 import pyodbc
 import codecs
+import json
 from urllib import *
 
 from utils import *
@@ -11,23 +12,25 @@ from virtdb import *
 
 PREFIX = 'http://keg.tsinghua.edu.cn/movie/'
 GRAPH = 'keg-movie2'
-SERVER_URL = 'http://localhost:5678/query'
-#SERVER_URL = 'http://10.1.1.23:5678/query'
+#SERVER_URL = 'http://localhost:5678/query'
+SERVER_URL = 'http://10.1.1.23:5678/query'
 
 class MovieKB():
     """
     Properties
     --------------------------
     """
-    
+
     def __init__(self):
         configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
         import sys
-        if sys.platform == 'linux':
+        if re.match('linux',sys.platform):#Linux
             #self.db = JenaVirtDB(**configs)
             #self.db = OdbcVirtDB(**configs)
+            configs["prefix"] = PREFIX
+            configs["url"] = SERVER_URL
             self.db = HttpDB(**configs)
-        else:
+        else:#Windows
             #self.db = JenaVirtDB(**configs)
             configs["prefix"] = PREFIX
             configs["url"] = SERVER_URL
@@ -146,7 +149,7 @@ class MovieKB():
                     while True:
                         if "[[" in string and "]]" in string:
                             start = string.index("[[") + 2
-                            end = string.index("]]", start) 
+                            end = string.index("]]", start)
                             t = string[start:end]
                             s.add(t.split("||")[0])
                             string = string[end:]
@@ -164,7 +167,7 @@ class MovieKB():
         if not d.has_key("label/zh"):
             #连label都没有。。。扔掉！
             return es
-        
+
         if d.has_key("alias"):
             es = es.union(set(d["alias"]))
         es = es.union(deep_concept(d, "instanceOf"))
@@ -207,7 +210,7 @@ class MovieKB():
                 return o
 
     def create_littleentity(self, entity_id):
-            
+
         entity = {}
         entity_id = str(entity_id)
         entity["id_"] = entity_id
@@ -227,8 +230,102 @@ class MovieKB():
 
         return entity
 
+    def get_entity_label(self, entity_id):
+        sq = 'select * from <%s> where { <%s> <%sobject/label/zh> ?o }'%(GRAPH, entity_id, PREFIX)
+        sq = 'select * from <%s> where {<%s> ?p ?o}'%(GRAPH, entity_id)
+        print sq
+        result_set = self.db.query(sq)
+        for p, o in result_set:
+            if p.endswith('label/zh'):
+                return o
+
+
+    def get_actor_info(self, actor_id):
+        sq = 'select * from <%s> where {%s ?p ?o}'%(GRAPH, PREFIX,actor_id)
+        #print sq
+        result_set = self.db.query(sq)
+        for p,o in result_set:
+            pname = p
+            return o
+
+    def get_entity_info(self,entity_id):
+        # 返回json数据
+        predictmap = getPropMap()
+        def get_baseinfo(entity_id,predictmap):
+            result = {}
+            objects= {}
+            sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
+            result_set = self.db.query(sq)
+            for p, o in result_set:
+                #print p,o
+                p = "<%s>"%p
+                if p in  predictmap['objectType']:
+                    pname = predictmap['objectType'][p]
+                    if pname not in result:
+                        result[pname] = []
+
+                    if o.startswith(PREFIX):
+                        #uid = "<%s>"%o
+                        #name= self.get_entity_label(uid)
+                        #result[pname].append({'id':uid,'name':name})
+                        if pname not in objects: objects[pname]=[]
+                        objects[pname].append(o)
+                    else:
+                        name= o
+                        result[pname].append({'name':name})
+                elif p in predictmap['dataType']:
+                    pname = predictmap['dataType'][p]
+                    if pname not in result: result[pname] = []
+                    result[pname].append(o)
+            return result,objects
+
+        result,objects = get_baseinfo(entity_id,predictmap)
+
+        def get_objectinfo(baseinfo,objects):
+            result = baseinfo
+            #处理objectType信息
+            for pname in objects:
+                if pname == u'演员表':
+                    actor_info = [{} for i in range(len(objects[u'演员表']))]
+                    for uid in objects[u'演员表']:
+                        sq = 'select * from <%s> where {<%s> ?p ?o}'%(GRAPH,uid)
+                        result_set = self.db.query(sq)
+
+                        actor_num = 0
+                        actor_name=""
+                        actor_id = ""
+                        for p,o in result_set:
+                            p = "<%s>"%p
+                            pname = predictmap['actor_node'][p]
+                            if pname == 'actor_number': actor_num = int(o) - 1
+                            elif pname == 'actor_name': actor_name = o
+                            elif pname == 'actor_id': actor_id = o
+                        actor_info[actor_num]['name']=actor_name
+                        if actor_id != "": actor_info[actor_num]['id']=actor_id
+                    result[u'演员表'] = actor_info
+                else:
+                    for uid in objects[pname]:
+                        print uid,pname
+                        name = self.get_entity_label(uid)
+                        result[pname].append({'id':uid,'name':name})
+            return result
+        def get_type(entity_id):
+
+        result =  get_objectinfo(result,objects)
+        result2 = {}
+        infobox = {}
+        for pname in result:
+            if pname in predictmap['common']:
+                result2[pname] = result[pname]
+            else: infobox[pname] = result[pname]
+        result2['Infoboxes'] = infobox
+        return result2
+
 if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
     mkb = MovieKB()
-    print mkb.get_prop_entities("b10050542")
+    #print mkb.get_prop_entities("b10050542")
+    fw = codecs.open('test.txt','w','utf-8')
+    fw.write(json.dumps(mkb.get_entity_info("b10004047"),ensure_ascii=False))
+    fw.close()
 

@@ -10,8 +10,8 @@ import codecs
 if not re.match('linux',sys.platform):
     from jpype import *
 
-import urllib 
-import urllib2 
+import urllib
+import urllib2
 import json
 
 from utils import *
@@ -23,10 +23,10 @@ class VirtDB(object):
     def __init__(self, uid, pwd, graph, dsn=None, driver=None, host=None, port=None):
         self.HOST = host
         self.PORT = port
-        self.DSN = dsn 
+        self.DSN = dsn
         self.DRIVER = driver
-        self.UID = uid 
-        self.PWD = pwd 
+        self.UID = uid
+        self.PWD = pwd
         self.GRAPH = graph
         self.charset="UTF-8"
 
@@ -146,7 +146,7 @@ class OdbcVirtDB(VirtDB):
 		y = []
 		for x in r: y.append(x[0])
 		results.append(tuple(y))
-            #if results and len(results) > 0 and type(results[0]) == tuple:
+           #if results and len(results) > 0 and type(results[0]) == tuple:
             #    results = [r[0] for r in results]
         except TypeError:
             return []
@@ -154,6 +154,7 @@ class OdbcVirtDB(VirtDB):
             cursor.close()
             self.db.close()
         return results
+
 
 class JenaVirtDB(VirtDB):
     """
@@ -166,7 +167,7 @@ class JenaVirtDB(VirtDB):
             raise ValueError("Need Value:PORT")
         VirtDB.__init__(self, uid, pwd, graph, host=host, port=port)
 
-        self.jvmpath = getDefaultJVMPath()
+        #self.jvmpath = getDefaultJVMPath()
         #startJVM(self.jvmpath, "-ea", "-Djava.ext.dirs={0}".format(os.path.abspath('.')+"/java/"))
         startJVM("C:/Program Files/Java/jre7/bin/server/jvm.dll","-ea","-Djava.ext.dirs={0}".format(os.path.abspath('.')+"/java/"))
         print ("JVM Start")
@@ -188,7 +189,10 @@ class JenaVirtDB(VirtDB):
 
 if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
-    string = "select * where {<http://keg.tsinghua.edu.cn/movie/instance/" + str(11510446) + "> ?p"+" ?o}"
+    string = "select * from <keg-movie2> where{<http://keg.tsinghua.edu.cn/movie/instance/b10038757> <http://keg.tsinghua.edu.cn/movie/object/label/zh> ?o}"
+    db = OdbcVirtDB(**configs)
+    result_set = db.query2(string)
+    for o in result_set: print o
 
     #db = JenaVirtDB(**configs)
     #for r in db.query(string):
@@ -197,10 +201,10 @@ if __name__ == "__main__":
     configs["url"] = "http://localhost:5678/query"
     configs["prefix"] = 'http://keg.tsinghua.edu.cn/movie/'
 
-    db = HttpDB(**configs)
-    for r in db.query("instance","b10050542"):
-        print (r[0]+" "+r[1])
-        
+    #db = HttpDB(**configs)
+    #for r in db.query("instance","b10050542"):
+       # print (r[0]+" "+r[1])
 
-    
+
+
 
