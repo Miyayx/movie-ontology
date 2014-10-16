@@ -231,22 +231,12 @@ class MovieKB():
         return entity
 
     def get_entity_label(self, entity_id):
-        sq = 'select * from <%s> where { <%s> <%sobject/label/zh> ?o }'%(GRAPH, entity_id, PREFIX)
+        #sq = 'select * from <%s> where { <%s> <%sobject/label/zh> ?o }'%(GRAPH, entity_id, PREFIX)
         sq = 'select * from <%s> where {<%s> ?p ?o}'%(GRAPH, entity_id)
-        print sq
         result_set = self.db.query(sq)
         for p, o in result_set:
             if p.endswith('label/zh'):
                 return o
-
-
-    def get_actor_info(self, actor_id):
-        sq = 'select * from <%s> where {%s ?p ?o}'%(GRAPH, PREFIX,actor_id)
-        #print sq
-        result_set = self.db.query(sq)
-        for p,o in result_set:
-            pname = p
-            return o
 
     def get_entity_info(self,entity_id):
         # 返回json数据
@@ -257,7 +247,6 @@ class MovieKB():
             sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
             result_set = self.db.query(sq)
             for p, o in result_set:
-                #print p,o
                 p = "<%s>"%p
                 if p in  predictmap['objectType']:
                     pname = predictmap['objectType'][p]
@@ -265,9 +254,6 @@ class MovieKB():
                         result[pname] = []
 
                     if o.startswith(PREFIX):
-                        #uid = "<%s>"%o
-                        #name= self.get_entity_label(uid)
-                        #result[pname].append({'id':uid,'name':name})
                         if pname not in objects: objects[pname]=[]
                         objects[pname].append(o)
                     else:
@@ -277,8 +263,12 @@ class MovieKB():
                     pname = predictmap['dataType'][p]
                     if pname not in result: result[pname] = []
                     result[pname].append(o)
+                elif 'instanceOf' in p:
+                    if 'type' not in objects:
+                        objects['type']=[o]
+                        result['type']=[]
+                    else: objects['type'].append(o)
             return result,objects
-
         result,objects = get_baseinfo(entity_id,predictmap)
 
         def get_objectinfo(baseinfo,objects):
@@ -305,27 +295,38 @@ class MovieKB():
                     result[u'演员表'] = actor_info
                 else:
                     for uid in objects[pname]:
-                        print uid,pname
                         name = self.get_entity_label(uid)
                         result[pname].append({'id':uid,'name':name})
             return result
-        def get_type(entity_id):
 
         result =  get_objectinfo(result,objects)
         result2 = {}
         infobox = {}
         for pname in result:
-            if pname in predictmap['common']:
+            #print pname
+            if pname in predictmap['common'] or pname=='type':
                 result2[pname] = result[pname]
             else: infobox[pname] = result[pname]
         result2['Infoboxes'] = infobox
         return result2
 
+    def getUriByName(self,name):
+        sq = """
+            select * from <keg-movie2> where {
+             {?s  <http://keg.tsinghua.edu.cn/movie/object/label/zh> "%s"}
+                 union
+             {?s  <http://keg.tsinghua.edu.cn/movie/common/alias> "%s"}
+            }
+            """%(name,name)
+        result_set = self.db.query(sq)
+        return [x[0] for x in result_set]
+
 if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
     mkb = MovieKB()
     #print mkb.get_prop_entities("b10050542")
-    fw = codecs.open('test.txt','w','utf-8')
-    fw.write(json.dumps(mkb.get_entity_info("b10004047"),ensure_ascii=False))
-    fw.close()
+    print mkb.getUriByName("冯小刚")
+    #fw = codecs.open('test.txt','w','utf-8')
+    #fw.write(json.dumps(mkb.get_entity_info("b10000001"),ensure_ascii=False))
+    #fw.close()
 
