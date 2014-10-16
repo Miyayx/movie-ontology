@@ -98,7 +98,7 @@ class OdbcVirtDB(VirtDB):
     def connect(self):
         pass
 
-    def query(self, sq):
+    def query2(self, sq):
         try:
             if self.DSN:
                 self.db = pyodbc.connect("DSN=%s;UID=%s;PWD=%s;charset=%s"%(self.DSN, self.UID, self.PWD, self.charset))
@@ -127,7 +127,7 @@ class OdbcVirtDB(VirtDB):
     def close(self):
         pass
 
-    def query2(self,sq):
+    def query(self, sq):
         try:
             if self.DSN:
                 self.db = pyodbc.connect("DSN=%s;UID=%s;PWD=%s;charset=%s"%(self.DSN, self.UID, self.PWD, self.charset) )
@@ -142,13 +142,13 @@ class OdbcVirtDB(VirtDB):
         cursor = self.db.cursor()
         print ("Query:%s"%sq)
         try:
-            results = []
-            for r in cursor.execute(sq).fetchall():
-                data = []
-                for x in r:  data.append(x[0])
-                results.append(tuple(data))
             #results = [(r[0][0], r[1][0]) for r in cursor.execute(sq).fetchall()]
-            #if results and len(results) > 0 and type(results[0]) == tuple:
+	    results = []
+	    for r in cursor.execute(sq).fetchall():
+		y = []
+		for x in r: y.append(x[0])
+		results.append(tuple(y))
+           #if results and len(results) > 0 and type(results[0]) == tuple:
             #    results = [r[0] for r in results]
         except TypeError:
             return []
