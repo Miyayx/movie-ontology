@@ -10,8 +10,8 @@ import codecs
 if not re.match('linux',sys.platform):
     from jpype import *
 
-import urllib 
-import urllib2 
+import urllib
+import urllib2
 import json
 
 from utils import *
@@ -23,10 +23,10 @@ class VirtDB(object):
     def __init__(self, uid, pwd, graph, dsn=None, driver=None, host=None, port=None):
         self.HOST = host
         self.PORT = port
-        self.DSN = dsn 
+        self.DSN = dsn
         self.DRIVER = driver
-        self.UID = uid 
-        self.PWD = pwd 
+        self.UID = uid
+        self.PWD = pwd
         self.GRAPH = graph
         self.charset="UTF-8"
 
@@ -125,6 +125,36 @@ class OdbcVirtDB(VirtDB):
     def close(self):
         pass
 
+    def query2(self,sq):
+        try:
+            if self.DSN:
+                self.db = pyodbc.connect("DSN=%s;UID=%s;PWD=%s;charset=%s"%(self.DSN, self.UID, self.PWD, self.charset) )
+        except Exception,e:
+            print e
+            if self.driver:
+                self.db = pyodbc.connect('DRIVER={%s};HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'%(self.DRIVER, self.HOST, str(self.PORT), self.UID, self.PWD))
+            else:
+                raise ValueError("Need DSN or DRIVER&&HOST&&PORT")
+
+        sq = "sparql " + sq
+        cursor = self.db.cursor()
+        print ("Query:%s"%sq)
+        try:
+            results = []
+            for r in cursor.execute(sq).fetchall():
+                data = []
+                for x in r:  data.append(x[0])
+                results.append(tuple(data))
+            #results = [(r[0][0], r[1][0]) for r in cursor.execute(sq).fetchall()]
+            #if results and len(results) > 0 and type(results[0]) == tuple:
+            #    results = [r[0] for r in results]
+        except TypeError:
+            return []
+        finally:
+            cursor.close()
+            self.db.close()
+        return results
+
 
 class JenaVirtDB(VirtDB):
     """
@@ -159,7 +189,10 @@ class JenaVirtDB(VirtDB):
 
 if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
-    string = "select * where {<http://keg.tsinghua.edu.cn/movie/instance/" + str(11510446) + "> ?p"+" ?o}"
+    string = "select * from <keg-movie2> where{<http://keg.tsinghua.edu.cn/movie/instance/b10038757> <http://keg.tsinghua.edu.cn/movie/object/label/zh> ?o}"
+    db = OdbcVirtDB(**configs)
+    result_set = db.query2(string)
+    for o in result_set: print o
 
     #db = JenaVirtDB(**configs)
     #for r in db.query(string):
@@ -168,10 +201,10 @@ if __name__ == "__main__":
     configs["url"] = "http://localhost:5678/query"
     configs["prefix"] = 'http://keg.tsinghua.edu.cn/movie/'
 
-    db = HttpDB(**configs)
-    for r in db.query("instance","b10050542"):
-        print (r[0]+" "+r[1])
-        
+    #db = HttpDB(**configs)
+    #for r in db.query("instance","b10050542"):
+       # print (r[0]+" "+r[1])
 
-    
+
+
 
