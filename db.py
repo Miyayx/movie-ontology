@@ -271,6 +271,10 @@ class MovieKB():
             return result,objects
         result,objects = get_baseinfo(entity_id,predictmap)
 
+        def get_Image_url(imageurl):
+            rurl=imageurl.split('||')[-1].replace(']','')
+            return rurl
+
         def get_objectinfo(baseinfo,objects):
             result = baseinfo
             #处理objectType信息
@@ -302,6 +306,9 @@ class MovieKB():
         result =  get_objectinfo(result,objects)
         result2 = {}
         infobox = {}
+        if 'Images' in result:
+            for i in range(len(result['Images'])):
+                result['Images'][i] = get_Image_url(result['Images'][i])
         for pname in result:
             #print pname
             if pname in predictmap['common'] or pname=='type':
@@ -363,8 +370,8 @@ class MovieKB():
                 ?ab <http://keg.tsinghua.edu.cn/movie/blanknode/actor_id> ?a.
                 optional {?a <http://keg.tsinghua.edu.cn/movie/people/spouse/zh> ?z.} }
             """%(name,name)
-       '''
-       result_set = self.db.query(sq)
+        '''
+        result_set = self.db.query(sq)
         result = []
         for m,o in result_set:
             e = {}
@@ -411,7 +418,7 @@ if __name__ == "__main__":
     mkb = MovieKB()
     #print mkb.get_prop_entities("b10050542")
     #print mkb.getUriByName("冯小刚")
-    #fw = codecs.open('test.txt','w','utf-8')
-    #fw.write(json.dumps(mkb.get_entity_info("b10000001"),ensure_ascii=False))
-    #fw.close()
+    fw = codecs.open('test.txt','w','utf-8')
+    fw.write(json.dumps(mkb.get_entity_info("b10000001"),ensure_ascii=False))
+    fw.close()
 
