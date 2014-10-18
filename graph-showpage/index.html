@@ -1,0 +1,205 @@
+
+<!-- saved from url=(0027)http://localhost:5666/show/ -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Instance</title>
+
+<!-- Core stylesheets do not remove -->
+<link href="http://xlore.org/css/bootstrap/bootstrap.css" rel="stylesheet">
+<link href="http://xlore.org/css/bootstrap/bootstrap-responsive.css" rel="stylesheet">
+<link href="http://xlore.org/css/lore4.css" rel="stylesheet">
+<link href="http://xlore.org/css/custom.css" rel="stylesheet">
+
+<!-- HTML5 shim, for IE6-8  support of HTML5 elements -->
+<!---–[if IE]-->
+<script src="http://xlore.org/js/jquery/html5.js"></script>
+<!--[endif]–--->
+
+<!-- Important plugins put in all pages -->
+<script src="http://xlore.org/js/jquery/jquery.min.js"></script>
+<script src="http://xlore.org/js/bootstrap/bootstrap.js"></script>
+
+<script src="./instance.js"></script>
+
+<script type="text/javascript">
+$(function() {
+
+    var imgAdjust = function(){
+
+    $('.thumbnails .thumbnail img').load(function(){
+      var imgw = $(this).width();
+      var aw = $(this).parent().width();
+      var imgh = $(this).height();
+      var ah = $(this).parent().height();
+      if(imgw < aw){
+      $(this).css('margin-left',(aw-imgw)/2);
+      }
+      if(imgh < ah){
+      $(this).css('margin-top',(ah-imgh)/2);
+      }			
+      });
+
+    if($('.thumbnails .thumbnail img').length > 12){				
+    }			
+    };
+
+    imgAdjust();
+
+});
+</script>
+<style>
+.data-block section.paragraph p{
+  font-size:14px;
+}
+.table th, .table td{
+  font-size:13px;
+}
+</style>
+
+</head>
+
+<body youdao="bind">
+<header>
+  <div class="navbar navbar-static-top">
+    <div class="navbar-inner">
+      <ul class="nav">
+      </ul>
+    </div>
+  </div>
+  <div id="search">
+    <div class="container">
+      <div class="lore-search">
+        <div class="search-bar pull-left">
+          <form class="form-search ">
+            <input type="text" id="search-info" class="span5 earch-query input-append " value="冯小刚">
+          </form>
+        </div>
+        <div class="form-search-button control-group pull-left">
+          <button class="btn btn-alt btn-inverse" id="search-btn">
+            Search
+          </button>
+          <span class="sparql"><a href="http://xlore.org/sparql.action">SPARQL</a></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<section id="main-page" class="container" role="main">
+  <article class="blue data-block">
+    <header>
+      <h2 class="name">后会无期</h2>
+      <br><br>
+    </header>
+    <section class="paragraph data-block">
+      <legend>Title</legend>
+      <div>
+        <p>后会无期</p>
+      </div>
+    </section>
+    <section class="paragraph data-block">
+      <legend>Type</legend>
+      <div>
+        <p>电影</p>
+      </div>
+    </section>
+    <section class="paragraph data-block">
+      <legend>Summary</legend>
+      <div>
+        <p>本片是著名作家兼赛车手韩寒的电影导演处女作。</p>
+      </div>
+    </section>
+    <section class="paragraph data-block">
+      <legend>Infoboxes</legend>
+      <div class="clearfix">
+        <table class="table table-condense table-striped span8 offset0">
+          <thead>
+            <tr>
+              <th style="width:30%"></th>
+              <th style="width:70%"></th>
+            </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>alias</td>
+            <td>The Continent</td>
+          </tr>
+          <tr>
+            <td>首映日</td>
+            <td>2014-07-24(中国大陆)</td>
+          </tr>
+          <tr>
+            <td>导演</td>
+            <td>韩寒 Han Han</td>
+          </tr>
+          <tr>
+            <td>制片地区</td>
+            <td>中国大陆</td>
+          </tr>
+          <tr>
+            <td>语言</td>
+            <td>汉语普通话,粤语,手语</td>
+          </tr>
+          <tr>
+            <td>演员表</td>
+            <td>陈柏霖,钟汉良,王珞丹,袁泉,陈乔恩,贾樟柯,白客,孔连顺,高华阳,冯绍峰</td>
+          </tr>
+          <tr>
+            <td>编剧</td>
+            <td>韩寒 Han Han</td>
+          </tr>
+          <tr>
+            <td>发行公司</td>
+            <td>博纳影业,天津博纳文化,华夏电影发行,劳雷影业,果麦文化</td>
+          </tr>
+          <tr>
+            <td>imdb</td>
+            <td>tt3896016</td>
+          </tr>
+          <tr>
+            <td>制片人</td>
+            <td>方励 Li Fang</td>
+          </tr>
+          <tr>
+            <td>来源网站</td>
+            <td>http://baike.baidu.com/view/627956.htm#sub12236823,http://movie.douban.com/subject/25805741/</td>
+          </tr>
+          <tr>
+            <td>体裁</td>
+            <td>喜剧,爱情,剧情</td>
+          </tr>
+          <tr>
+            <td>时长</td>
+            <td>106分钟</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="paragraph data-block">
+      <legend>Images</legend>
+      <ul class="thumbnails row-fluid">
+        <li class="span2" style="margin-left:30px"><a class="thumbnail" href="./Instance_files/203fb80e7bec54e7dd92bcf1bb389b504ec26ae7.jpg"><img src="./Instance_files/203fb80e7bec54e7dd92bcf1bb389b504ec26ae7.jpg"></a></li>
+        <li class="span2" style="margin-left:30px"><a class="thumbnail" href="./Instance_files/960a304e251f95ca7f14af4ccb177f3e66095262.jpg"><img src="./Instance_files/960a304e251f95ca7f14af4ccb177f3e66095262.jpg"></a></li>
+        <li class="span2" style="margin-left:30px"><a class="thumbnail" href="./Instance_files/2cf5e0fe9925bc31d3563d625cdf8db1ca1370c4.jpg"><img src="./Instance_files/2cf5e0fe9925bc31d3563d625cdf8db1ca1370c4.jpg"></a></li>
+        <li class="span2" style="margin-left:30px"><a class="thumbnail" href="./Instance_files/5fdf8db1cb1349549c15d49e544e9258d0094ac4.jpg"><img src="./Instance_files/5fdf8db1cb1349549c15d49e544e9258d0094ac4.jpg"></a></li>
+        <li class="span2" style="margin-left:30px"><a class="thumbnail" href="./Instance_files/48540923dd54564e0a6ed8c3b1de9c82d0584fc4.jpg"><img src="./Instance_files/48540923dd54564e0a6ed8c3b1de9c82d0584fc4.jpg"></a></li>
+        <li class="span2" style="margin-left:30px"><a class="thumbnail" href="./Instance_files/574e9258d109b3de07b4d892cebf6c81810a4cc4.jpg"><img src="./Instance_files/574e9258d109b3de07b4d892cebf6c81810a4cc4.jpg"></a></li>
+        <li class="span2" style="margin-left:30px"><a class="thumbnail" href="./Instance_files/f9dcd100baa1cd11c9574fdabb12c8fcc2ce2d62.jpg"><img src="./Instance_files/f9dcd100baa1cd11c9574fdabb12c8fcc2ce2d62.jpg"></a></li>
+        <li class="span2" style="margin-left:30px"><a class="thumbnail" href="./Instance_files/b812c8fcc3cec3fd3ddf9a8fd488d43f86942762.jpg"><img src="./Instance_files/b812c8fcc3cec3fd3ddf9a8fd488d43f86942762.jpg"></a></li>
+        <li class="span2" style="margin-left:30px"><a class="thumbnail" href="./Instance_files/fd039245d688d43f4248ac087f1ed21b0ff43b62.jpg"><img src="./Instance_files/fd039245d688d43f4248ac087f1ed21b0ff43b62.jpg"></a></li>
+        <li class="span2" style="margin-left:30px"><a class="thumbnail" href="./Instance_files/241f95cad1c8a786662176f46509c93d71cf50c4.jpg"><img src="./Instance_files/241f95cad1c8a786662176f46509c93d71cf50c4.jpg"></a></li>
+        <li class="span2" style="margin-left:30px"><a class="thumbnail" href="./Instance_files/b64543a98226cffc75441953bb014a90f703eae1.jpg"><img src="./Instance_files/b64543a98226cffc75441953bb014a90f703eae1.jpg"></a></li>
+        <li class="span2" style="margin-left:30px"><a class="thumbnail" href="./Instance_files/b151f8198618367a55bd36242c738bd4b31ce517.jpg"><img src="./Instance_files/b151f8198618367a55bd36242c738bd4b31ce517.jpg"></a></li>
+        <li class="span2" style="margin-left:30px"><a class="thumbnail" href="./Instance_files/72f082025aafa40faec8f2eea864034f78f019f2.jpg"><img src="./Instance_files/72f082025aafa40faec8f2eea864034f78f019f2.jpg"></a></li>
+      </ul>
+    </section>
+    <section class="paragraph data-block">
+      <legend>FullText</legend>
+      <div>
+        <p>基本信息*****《后会无期》是一部由[[韩寒||/subview/5972/10680834.htm]]担任编剧及导演，由[[冯绍峰||/view/1047721.htm]]、[[陈柏霖||/view/33218.htm]]、[[钟汉良||/view/3050.htm]]、[[王珞丹||/view/108616.htm]]、[[袁泉||/subview/27196/10582648.htm]]、[[陈乔恩||/view/8069.htm]]联合主演的喜剧爱情冒险[[公路电影||/view/670374.htm]]。故事讲述了几个在东极岛长大的年轻人决定重新选择自己的前路，在他们横跨大陆的自驾旅途上的传奇经历与际遇让他们有了各自不同的命运归宿的故事。*****影片于2014年07月24日在中国内地上映。 [1-2]*****中文名 后会无期 外文名 The Continent 出品时间 [[2014年||/view/1394194.htm]] 出品公司 劳雷影业、果麦文化、博纳影业 发行公司 天津博纳文化、华夏电影发行 制片地区 中国 制片成本 5000万人民币 拍摄地点 [[上海||/view/1735.htm]]，[[四川西昌||/view/14709700.htm]]，内蒙古赤峰，[[浙江||/view/4150.htm]][[舟山||/view/39796.htm]][[普陀||/subview/440302/9763605.htm]]，[[东极岛||/view/182181.htm]] 拍摄日期 2014年2月14日 导    演 [[韩寒||/subview/5972/10680834.htm]] 编    剧 [[韩寒||/subview/5972/10680834.htm]] 制片人 [[方励||/view/1477886.htm]] 类    型 喜剧，爱情，冒险 主    演 [[冯绍峰||/view/1047721.htm]]，[[陈柏霖||/view/33218.htm]]，[[钟汉良||/view/3050.htm]]，[[王珞丹||/view/108616.htm]]，[[袁泉||/subview/27196/10582648.htm]]，[[陈乔恩||/view/8069.htm]] 片    长 106分钟 上映时间 2014年07月24日 对白语言 [[普通话||/view/4591.htm]] 色    彩 彩色*****1电影剧情 太平洋的第一缕海风，吹来告别的消息，三个从此没有故乡的年轻人，开启一段横穿大陆的旅程。都市、小镇、高山、丛林、荒漠，他们感受猝不及防的动心与难以名状的伤心，遇见那些他们只配错过的女孩，一样流浪无家的动物，善恶莫测的传奇旅人。一次次的告白与告别交织起这段旅程，勾勒出几种截然不同的人生。 [3]*****2演职员表 演员表 角色 演员 备注 马浩汉[4] [[冯绍峰||/view/1047721.htm]] ---- 江河 [5] [[陈柏霖||/view/33218.htm]] ---- 阿吕[6] [[钟汉良||/view/3050.htm]] ---- 苏米[7] [[王珞丹||/view/108616.htm]] ---- 刘莺莺[8] [[袁泉||/view/27196.htm]] ---- [[周沫||/subview/1233075/14980025.htm]][9] [[陈乔恩||/view/8069.htm]] ---- 苏米三叔 [[贾樟柯||/view/13924.htm]] 客串 苏米弟弟 [[罗宏明||/view/10876998.htm]] 客串 苏米哥哥 [[孔连顺||/view/11164637.htm]] 客串 胡生 [[高华阳||/view/5525560.htm]] ---- 职员表 ▪ 出品人：[[方励||/view/1477886.htm]]；[[路金波||/view/1045420.htm]]；[[于冬||/view/436713.htm]] ▪ 制作人：[[方励||/view/1477886.htm]] ▪ 导演：[[韩寒||/view/5972.htm]] ▪ 编剧：[[韩寒||/view/5972.htm]] ▪ 摄影：廖拟 ▪ 配乐：小林武史 Takeshi Kobayashi ▪ 剪辑：[[肖洋||/view/1727839.htm]] ▪ 造型设计：黄育男；[[刘珺||/view/2232767.htm]] 以上参考 [10]*****3角色介绍 马浩汉| 演员 冯绍峰 东极岛岛民，一个有个人价值观和世界观，勇于冒险，早几年就到岛外的世界去闯过，有见识，想回到东极岛建设家乡。不过，残酷的现实淹没他的理想，他对外来事物的侵袭东极岛他十分激动，拿着扬声器号召一场反抗运动。但最终失败，他是一个有本事的失败者。在旅途中他是负责吆喝的领头。 江河| 演员 陈柏霖 颓废的文艺青年，在东极岛做老师，认识浩汉。现在被分配去最西边的地方任教，因此与浩汉、胡生踏上了横跨国家的行程。他是个善良、纯净的人，遵守生活规则。在旅途中，他是精神上的领导者。 阿吕| 演员 钟汉良 在浩汉和江河旅程中突然出现蹭车的旅行客，他说他是骑摩托环游的骑士，是对妻子深情至深的性情中人，是一个像旅行者一号一样有理想是男人。最后，却偷走了浩汉的车扬长而去。 苏米| 演员 王珞丹 在江河和浩汉旅行中的陌生女子，根据她自己后来的述说，她是被男人伤害过，怀了孕，假扮小姐，和三叔串通进行仙人跳，想骗一点钱出国生孩子。在宾馆里故意挑逗诱惑江河，在三叔假扮警察查房，江河带她逃走后，却无意中被江河的善良憨厚给吸引。不过，还是被她三叔和哥哥给带走。 周沫| 演员 陈乔恩 浩汉青梅竹马的邻家女孩，到大城市去打拼，在片场做替身演员，是那种没有台词和正面的替身。不过，她相信在大城市更有公平竞争的机会，踏实奋斗的一个女孩子。以前是喜欢浩汉的。 刘莺莺| 演员 袁泉 台球厅女老板，球技高超，一杆清台灭了浩汉耍帅的想法。她是浩瀚从儿时就结识的笔友，也是他一直认为在远方的女朋友。当浩汉终于千里迢迢来到她面前，她却把残酷的现实告诉给浩汉，她是浩汉父亲的继女，保持通信只是他父亲想要了解浩汉的情况而已，令一直处在迷茫性乐观的浩汉顿时看清了现实。 以上内容来自： [11]*****4电影评价 精彩影评 后会无期：没料别装大尾巴狼 后会无期的片名是韩寒抄袭的，抄的汪苏泷、徐良的同名歌曲《后会无期》，当然我跟某圈内明星本来聊过后会无期这片名，也知会过汪，汪曾说韩寒没有沟通过这四个字，被韩寒擅自盗用。如果你觉得... |影视编剧、影评人、自由撰稿人、中莱坞创始人 |2014-08-25 16:2090 我们的舌头上有星辰大海 中国电影现在像澡堂子，不管什么人都甩开膀子往里跳；导演这两字就像红领巾，带上你就是个合格的少先队员，甭管你昨天还在哪儿随地大小便。 有电影人说，中国电影现在还在初级阶段，因为好多... |《北京青年报》微博专栏“电影槽“及《东方早报》公共账号“有戏”特约影评人 |2014-08-12 12:39271 人生路上，我们都与昨天后会无期 懒得去分享那里细细评分，按照我一贯的习惯“四舍五入”，将75分直接点成8颗星（这个75分绝对不是看这里的平均分乱说的，证据可见我之前微博O(∩_∩)O） 对于这部电影，我最想说的一句话是“不... 山鬼辛舞|新闻媒体记者，暴风影视特约影评人，时光网主力博主 |2014-08-08 14:06379 只配错过的好姑娘。 笑点挺多，这很好。可是所谓“金句”也太多，这很不好。我坐在电影院看着他们一直说，一直说。然后我想起小时候买《童话大王》，郑渊洁总是在后面大页大页地插入“郑渊洁语录”，我没记错的话... 迷星儿|浮光掠影撷精彩，谈笑风生论乾坤。品好戏，乐人生！ |2014-08-06 17:56215 旅行者 满满的段子党，上次看到这种电影还是贺岁档的《私人定制》~但是我更喜欢这个电影一点！ 　　 　　电影里好多好看的演员呀！比如说陈乔恩，真的挺可爱呀！但是戏份好少~这是一部有女人的戏，但... 嘉隐|学生党，正能量，爱电影，爱分享~ |2014-08-04 22:0176 冯唐金线 冯唐金线，最早源于冯唐关于韩寒代笔门的文章《大是》。 　　 　　他在文中写道：“文学的标准的确很难量化，但是文学的确有一条金线，一部作品达到了就是达到了，没达到就是没达到，对于门... 波托西|文字工作者，非典型哲学硕士 |2014-08-03 21:0680 迸发有时，后会无期 在路上，是永远的信仰。发出声音，是不能阻挡的渴望。看完电影之后，本来不想多评论什么，因为感觉一遍不太够。不过偶然间看到《新闻当事人》里采访韩寒，他说：电影里人物口中的观点，并不是... bluedragen|在电影这门光影艺术中寻找正能量并分享给同样爱电影的人们。 |2014-08-02 17:46114 失败的情怀 二十四号我回到北京，正好是《后会无期》上映的日子。当天下午，我怀着半个多月的期待，走进影院。某种程度上讲，对于韩寒的作品我已经养成了一种机械性的习惯，不去看看似乎是不可能的。... 路灵涵|一个码字理科生 |2014-07-31 22:52174 段子手给丁丁哥哥的情书 博客点击率常年雄踞徐静蕾之下、万人之上的韩寒，其实是很晚很晚才涉足微博界的，理由无非仍然深阅读浅阅读之类——我不是在批评他如今一天天微博营销得多么起劲，而是，多年之后，当我这个读... |2014-07-31 20:34135 《后会无期》：旅行者不死，梦想者不败！ 作者：王小叶儿 我是那崇高的旅行者号， 我被世人崇拜。 我要大声歌颂， 歌颂我伟大的梦想， 歌颂我不屈的灵魂。 让世人看到我不朽的容光。 但其实，我只是一只青蛙， 被水煮的青蛙。 我不要被... 王小叶儿|迷影人。慢热。疏离。敏感。浮夸。妄想症。 |2014-07-30 18:06115 《后会无期》：粉丝电影2.0 　很少有电影能像《后会无期》这样，让我在看到全片之前对它充满疑问和想象。早先曝光的宣传物料，从第一支先导预告，到《平凡之路》MV，在影像上采取了一种相当回避的态度——它们隐约透露出... 史小努比|铁狮子坟电影学硕士，目前致力于卖电影票这一伟大事业 |2014-07-30 17:5188 文艺何以“作”？ 　 电影《后会无期》同《小时代》一样从一开始便都有着极强的针对人群，《小时代》所为之打造的是少女之梦，而《后会无期》营造的则是文青之爱，二者的你方唱罢我登场，实质本无差别，只是针... |搜狐新闻、电影网特约影评人 |2014-07-28 23:09283 本来没什么，假装有什么 不管郭敬明和韩寒两个人前者多么强烈得表示自己不想跟后者扯上关系、而后者有事没事就要和前者扯上关系，但两人的潜台词倒是空前一致，都是往死里鄙视对方。郭敬明用意淫界教主与试衣间导演的... |《北京青年报》微博专栏“电影槽“及《东方早报》公共账号“有戏”特约影评人 |2014-07-28 22:17200 想当导演，请先学习镜头语言 不出所料又是一部段子电影。竟然有人认为这不是心灵鸡汤，那请问你们觉得什么才是心灵鸡汤呢？不是说点悲观台词碰个灰头土脸，就等同于揭露了人生的真面目。拆除那些hard sale的生硬金句，这电影... 流川紫芸|感性看电影，理性写影评 |2014-07-27 22:35359 情谊有期，后会无期 市场这么火爆，每一部大爆电影好像都在告诉你，不来看是你的损失。其实不太爱跟风，奈何后会期待已久，上映几天了终于有空静下来看一看，了解了解韩寒，感受一下初执导筒的作家的光影笔触。 ... 麦斯圈|喜欢电影，喜欢悬疑，喜欢高手创造的异端世界 |2014-07-27 18:15198 《后会无期》：我不是一只文艺狗 是个吹蜡烛的人 文/鱼为 作为一部“公路片”，《后会无期》是一段开心并糟心的旅程，影片中的人物一路由东向西，妄图将人生的感悟塞满车厢，最后却连车都被人开去。韩寒的小说铺在银幕里，应该是这种感觉... 鱼为|影视观察评论 娱乐热点品鉴 |2014-07-27 13:01185 最决绝的话语，是为了更美好的相聚。 作者：王小叶儿 后会无期， 是世界上最遥远的距离， 他们在银幕里，我却在银幕前。 后会无期， 是世界上最亲近的距离， 他们在电影里， 电影在我心里。 后会无期， 在风里，在雨里，在路上，在... 王小叶儿|迷影人。慢热。疏离。敏感。浮夸。妄想症。 |2014-07-27 02:0435 《后会无期》：祭奠我们无处安放的青春 文 / 赤叶青枫 听过许多道理，依然过不好这一生。 韩寒的电影处女作《后会无期》的主海报上，赫然印着这样一句Slogan。这句Slogan在多少刺痛人心之余，似乎也基本奠定了整部电影的基调：不安与迷... |资深影评人、作词人 |2014-07-25 23:25235 文艺何以“作”？ 　　电影《后悔无期》同《小时代》一样从一开始便都有着极强的针对人群，《小时代》所为之打造的是少女之梦，而《后悔无期》营造的则是文青之爱，二者的你方唱罢我登场，实质本无差别，只是针... |搜狐新闻、电影网特约影评人 |2014-07-25 11:26331 人生就是一场旅行，你估中了开头，却错过了结尾 人生就是一场旅行，你估中了开头，却错过了结尾 ——致电影《后会无期》 有的电影看了开场你已知结尾，有的电影，看了五分钟你就想摔遥控器、发脾气走开，有的电影，看过开头，你永远不知道... 百合|爱生活，爱电影，用心读懂所爱的每一部电影 |2014-07-25 10:36267 后会无期 继续放肆 爱要克制 文艺版的泰囧。笑料包袱足够。 韩寒式冷幽默，幽默后的感伤。 剧情比较松散，好在金句颇多，笑果不错。 冯绍峰大赞，演技值得肯定，多处笑料由其制造。 陈柏霖相当帅酷，演技也不错。 钟汉良大... 微子其|知我命，知吾心 |2014-07-24 03:25132 【后会无期】————将文青一网打尽？ 刚开始听平凡的路觉得一般， 听了第二遍觉得有些味道， 等把MV看完后，心里却抑制不住一声呐喊， 很喜欢！还是那个朴树！ 把韩寒和朴树这两人放在一起，我突然想起了他们共有的一个词-------文... 微子其|知我命，知吾心 |2014-07-16 21:18580 | | 标题 内容*****电影图片 29张 1/1*****4音乐原声 歌名 作词 作曲 演唱 备注 《[[东极岛岛歌||/view/14182272.htm]]》 [[韩寒||/subview/5972/10680834.htm]] Erran Baron Cohen 合唱 片头曲 《[[后会无期||/subview/627956/14760094.htm]]》　 韩寒 Arthur Kent / Sylvia Dee [[邓紫棋||/view/1926035.htm]] 同名主题曲，邓紫棋首次献唱 《[[平凡之路||/view/14183551.htm]]》 韩寒、[[朴树||/subview/3530/5728075.htm]] 朴树 [[朴树||/subview/3530/5728075.htm]] 原创主题曲，朴树十年沉淀新歌 《[[que sera sera||/view/917711.htm]]》 Jay Livingston Ray Evans [[Doris Day||/view/825243.htm]] 插曲，亦是片中苏米的手机铃声 《[[女儿情||/subview/947006/10970230.htm]]》 [[杨洁||/subview/20130/5629906.htm]] [[许镜清||/view/1067686.htm]] [[万晓利||/view/63344.htm]] 插曲，致敬《[[西游记||/subview/2583/5315046.htm]]》 《[[追月||/subview/851762/11156540.htm]]》 [[唐书琛||/view/3663057.htm]] [[侯湘||/view/228350.htm]] [[朱茵||/subview/19465/5920802.htm]] 背景音乐，原《[[大话西游||/subview/25489/5853281.htm]]》插曲 影片配乐工作由日本导演[[岩井俊二||/view/68963.htm]]的御用配乐[[小林武史||/view/113159.htm]]担当。 注：以上参考 [12] 5幕后花絮 1.《后会无期》有很多重场戏是在韩寒的家乡[[上海||/view/1735.htm]]金山区[[亭林镇||/view/2440996.htm]]取景，但他否认这部电影有着自传色彩，“选择在老家拍摄主要是因为好操作，我们找到的一个仓库相比一些拍摄棚要便宜一些”。 2.很多剧组工作人员说，影片拍摄已近尾声，但从未见过韩寒发过火，即便发生了状况，也从未见过他一脸怒气大声说话，“韩导笑起来是无害的，毫无攻击力”。 3.韩寒喜欢在演员的耳边说悄悄话。对此剧组工作人员私下戏言：韩寒与男演员交流像是在“搞基”，与女演员交流则像是在泡妞。 4.《后会无期》里有大量驾车行驶在路上的戏份，但韩寒决定全片不采用漂移等炫技场面，不过常常在拍摄结束后，韩寒便把冯绍峰从车里拽出来，自己钻进去来个漂移或者甩尾解解瘾。 5.为了防止剧本泄露，剧本用了很多化名，包括《欢天喜地过大年》、《情到深处人孤独》、《爱你在心口难开》、《至尊霹雳真豪情》等，每个演员拿到的那一部分都是不一样的。 以上内容来自： [13-14] 6幕后制作 前期筹备 从剧本、选景、到开拍，《后会无期》前后筹备五年，无原著小说，影片讲述的是一个新编原创故事。2014年1月6日，[[韩寒||/subview/5972/10680834.htm]]发布了此片的拍摄计划；2014年2月14日该片正式开机。 [15-16] 配乐制作 　　《后悔无期》由[[日本||/subview/1554/14766485.htm]]音乐家[[小林武史||/view/113159.htm]]为《后会无期》配乐。 [12] 《后会无期》邓紫棋mv 拍摄过程 为呈现《后会无期》的视野与格局，剧组先后辗转[[上海||/view/1735.htm]]、[[四川||/view/7627.htm]]西昌、[[内蒙古||/view/5318.htm]]赤峰、[[浙江||/view/4150.htm]]舟山普陀和[[东极岛||/view/182181.htm]]五地，从东边到西边，从零海拔的海平面到3500的赤峰，行程1万多公里，用了3个多月（共106天）时间完成影片的拍摄， [17]拍摄中使用了航拍技术，动用了移动平台、登陆艇以及重型直升机等。 [17] 7影片评价 正面评价 《后会无期》虽说未曾出现在韩寒出版作品列表，但与《一座城池》相似，因缘某种出由，奔走在未知的旅途。《后会无期》貌似一路追寻着什么，却皆如指间流沙无从驻手。《后会无期》在 荒诞的地平线远端加入了丝丝微亮，但说到底与《一座城池》都可谓是不可持有的人生碎片。而相比《一座城池》散乱而块状的结构，《后会无期》的叙事要圆润了许多，韩寒在导演这门学问上显然也是下了苦功的，但终因对人生碎片化处理，以及对解构性文本追求而削弱了故事架构。当然，你也可以说是韩寒对结构故事的一种不屑。《后会无期》的观影感觉，就如同坐下来听人讲《1988，我想和这个世界谈谈》的感觉，个人风格极为明显。这一点，作为初次导演者，韩寒没有失去自己的风格，非常难得。 （新华娱乐评） [18] 反面评价 去谈《后会无期》的剧情，是件很无趣的事。无非是两个废柴，开始了他们的荒唐之旅，中间碰到几个骗子，男的女的都有。严格来说是三个人，硬要解读的话，浩汉代表的是理想，江河指涉的是现实，而一开始的叙述事并很快就走失的胡生代表的是童真。两个宝货把胡生弄丢了，无非是在阐明他们的童真从上路的那一刻就不复存在。 （腾讯娱乐评） [19] 从整体性上来说，《后会无期》其实非常散漫，由东向西穿越中国的线路上，几个关联不大的片段点缀其间，三个开场出现的主角，在前四分之一便丢失了一个，他们一路遇到身份暧昧、灵魂飘零的男女，其中有心在他乡的老乡，不是爱情的亲情，貌似骗子的真挚，疑似朋友的欺骗，还有一只善于装死的雪橇犬，他们与两个中心人物江河与浩汉产生了或大或小，或恒久或短暂的交集。 （人民娱乐评）[20] 8发行信息 上映信息 2014年7月24日，《后会无期》首日排片36.86%，全国排片33062场，居第一，并最终获得票房7460万元（其中，零点场410万票房排名华语片第四）。 此后周五至周日三天，《后会无期》的排片和票房分别为35.94%，6140万元；37.16%，7850万元；37.24%，6900万元。其中周六日排片都超过首日，周六票房创该片单日票房新高。 [22-24] 于4天内突破3亿元大关，再于7天内过4亿元大关，在影片上映的11天里，累计票房达5.13亿元，而截至8月4日，12天票房累计已过5.25亿元。在历史数据中，《后会无期》是在非贺岁春节档中最快破五亿的华语电影。 [25-26] 截至2014年8月10日，《后会无期》上映18天，累计收票房5.9亿，居历史国产片票房榜第十四。 [27] 以上内容来自： [28]</p>
+      </div>
+    </section>
+  </article>
+</section>
+</body>
+</html>
