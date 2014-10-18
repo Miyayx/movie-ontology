@@ -363,14 +363,14 @@ class MovieKB():
                 ?ab <http://keg.tsinghua.edu.cn/movie/blanknode/actor_id> ?a.
                 optional {?a <http://keg.tsinghua.edu.cn/movie/people/spouse/zh> ?z.} }
             """%(name,name)
-       '''
-       result_set = self.db.query(sq)
-        result = []
-        for m,o in result_set:
-            e = {}
-            e['演员']=m
-            if o is not None: e['配偶']=o
-            result.append(e)
+        '''
+        result_set = self.db.query(sq)
+         result = []
+         for m,o in result_set:
+             e = {}
+             e['演员']=m
+             if o is not None: e['配偶']=o
+             result.append(e)
         return result
         '''
         return sq
