@@ -26,10 +26,10 @@ class MovieKB():
         import sys
         if re.match('linux',sys.platform):#Linux
             #self.db = JenaVirtDB(**configs)
-            #self.db = OdbcVirtDB(**configs)
-            configs["prefix"] = PREFIX
-            configs["url"] = SERVER_URL
-            self.db = HttpDB(**configs)
+            self.db = OdbcVirtDB(**configs)
+#             configs["prefix"] = PREFIX
+#             configs["url"] = SERVER_URL
+#             self.db = HttpDB(**configs)
         else:#Windows
             #self.db = JenaVirtDB(**configs)
             configs["prefix"] = PREFIX
