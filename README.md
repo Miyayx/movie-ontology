@@ -86,7 +86,7 @@ Setting：
 
 * marisa-trie
     ```
-    pip install marisa
+    pip install marisa-trie
     ```
     > Windows:[marisa-trie](http://www.lfd.uci.edu/~gohlke/pythonlibs/#marisa-trie)
 
