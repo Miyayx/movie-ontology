@@ -1,9 +1,11 @@
-# -*- coding: utf-8 -*-
+#encoding=utf-8
 import time
 import os
 import copy
 import datetime
 import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 import re
 import math
 import json
