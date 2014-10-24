@@ -96,7 +96,74 @@ class MovieKB():
             result[key] = o
 
         return result
+    
+    def get_whole_info_label (self,entity_id):
+        """
+                            返回该实体的结构化信息p2o，
+                key为该实体的属性名（去掉前缀，保留/分割的第5个部分）
+                value为该属性值（若为对象型属性，则替换为该对象的label）
+        """
+        q_result = self.get_instance_properties(entity_id)
+        p2o = self.parse_properties(q_result)
+        for p in p2o:
+            for obj in p2o[p]:
+                if obj.startswith(PREFIX):
+                    if p != 'actor_list' :
+                        label = self.get_label_uri(obj)
+                    else: label = self.get_bb_label_uri(obj)
+                    p2o[p][p2o[p].index(obj)] = label
+        return p2o
+    
+    def get_whole_info (self,entity_id):
+        """
+                            返回该实体的结构化信息p2o，
+                key为该实体的属性名（去掉前缀，保留/分割的第5个部分）
+                value为该属性值（若为对象型属性，则替换为该对象的label）
+        """
+        q_result = self.get_instance_properties(entity_id)
+        p2o = self.parse_properties(q_result)
+        for p in p2o:
+            if p == 'actor_list' :
+                for obj in p2o[p]:
+                    if obj.startswith(PREFIX):   
+                                        
+                        id = self.get_bb_obj_uri(obj).split("/")[-1]
+                        
+                        p2o[p][p2o[p].index(obj)] = id
 
+        return p2o
+    
+    def extract_mention_in_body(self, entity_id):
+        """
+                    从summary和description中提取[[]]之间的实体内容
+        """
+        q_result = self.get_instance_properties(entity_id)
+        p2o = self.parse_properties(q_result)
+        print(p2o)
+        s = set()
+        t = ""
+        for string in p2o["description/zh"]:#注意value是list形式的
+            while True:
+                if "[[" in string and "]]" in string:
+                    start = string.index("[[") + 2
+                    end = string.index("]]", start) 
+                    t = string[start:end]
+                    s.add(t.split("||")[0])
+                    string = string[end:]
+                else: break
+        t = ""        
+        for string in p2o["summary"]:#注意value是list形式的
+            while True:
+                if "[[" in string and "]]" in string:
+                    start = string.index("[[") + 2
+                    end = string.index("]]", start) 
+                    t = string[start:end]
+                    s.add(t.split("||")[0])
+                    string = string[end:]
+                else: break
+
+        return s
+        
     def get_prop_entities(self, entity_id):
 
         def deep_instance(d, p):
@@ -106,9 +173,29 @@ class MovieKB():
             s = set()
             if p in d.keys():
                 for e in d[p]:#注意value是list形式的
-                    if e.startswith("http"):
+                    if e.startswith(PREFIX):
                         i = e.split("/")[-1]
                         l = self.get_label(i)
+                        if not l:
+                            return s
+                        if "[" in l:
+                            s.add(l[:l.index("[")])
+                        else: s.add(l)
+                    else: s.add(e)
+            return s
+        
+        def deep_blankNode(d, p):
+            """
+            获取blank node地址下的label
+            """
+            s = set()
+            if p in d.keys():
+                for e in d[p]:#注意value是list形式的
+                    
+                    if e.startswith(PREFIX):
+#                         print("debug :" + e)
+                        i = e.split("/")[-1]
+                        l = self.get_bb_label(i)
                         if not l:
                             return s
                         if "[" in l:
@@ -124,7 +211,7 @@ class MovieKB():
             s = set()
             if p in d.keys():
                 for e in d[p]: #注意value是list形式的
-                    if e.startswith("http"):
+                    if e.startswith(PREFIX):
                         i = e.split("/")[-1]
                         l = self.get_concept_label(i)
                         if not l:
@@ -171,7 +258,7 @@ class MovieKB():
         # For movie
         es = es.union(deep_instance(d,"directed_by"))
         es = es.union(deep_instance(d,"written_by"))
-        es = es.union(deep_instance(d,"actor_list"))
+        es = es.union(deep_blankNode(d,"actor_list"))
         # For actor
         es = es.union(deep_instance(d,"work_list"))
         es = es.union(deep_instance(d,"profession/zh"))
@@ -198,9 +285,54 @@ class MovieKB():
         for p, o in result_set:
             if p.endswith('label/zh'):
                 return o
+    
+    def get_label_uri(self, uri):
+        """
+                        用uri而不是id获取label
+        """
+        #sq = 'select * from <%s> where {<%sinstance/%s> <%scommon/summary> ?o }'%(GRAPH, PREFIX, entity_id, PREFIX)
+        sq = 'select * from <%s> where {<%s> ?p ?o}'%(GRAPH, uri)
+        result_set = self.db.query(sq)
+        for p, o in result_set:
+            if p.endswith('label/zh'):
+                return o
+            
+    def get_bb_label(self, entity_id):
+        """
+                         获取blank node的label
+        """
+        #sq = 'select * from <%s> where {<%sinstance/%s> <%scommon/summary> ?o }'%(GRAPH, PREFIX, entity_id, PREFIX)
+        sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
+        result_set = self.db.query(sq)
+        for p, o in result_set:
+            if p.endswith('actor_name'):
+                return o
+            
+    def get_bb_label_uri(self, uri):
+        """
+                        用uri而不是id获取blank node 的label
+        """
+        #sq = 'select * from <%s> where {<%sinstance/%s> <%scommon/summary> ?o }'%(GRAPH, PREFIX, entity_id, PREFIX)
+        sq = 'select * from <%s> where {<%s> ?p ?o}'%(GRAPH, uri)
+        result_set = self.db.query(sq)
+        for p, o in result_set:
+            if p.endswith('actor_name'):
+                return o
+            
+    def get_bb_obj_uri(self, uri):
+        """
+                        用uri而不是id获取blank node 的label
+        """
+        #sq = 'select * from <%s> where {<%sinstance/%s> <%scommon/summary> ?o }'%(GRAPH, PREFIX, entity_id, PREFIX)
+        sq = 'select * from <%s> where {<%s> ?p ?o}'%(GRAPH, uri)
+        result_set = self.db.query(sq)
+        for p, o in result_set:
+            if p.endswith('actor_id'):
+                return o
 
     def get_concept_label(self, entity_id):
-        sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
+#         sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
+        sq = 'select * from <%s> where {<%sconcept/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
         result_set = self.db.query(sq)
         for p, o in result_set:
             if p.endswith('label/zh'):
@@ -233,5 +365,7 @@ class MovieKB():
 if __name__ == "__main__":
     configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
     mkb = MovieKB()
-    print (mkb.get_prop_entities("b10050543"))
+#     print(mkb.get_prop_entities("dt10063708"))
+    print(mkb.get_whole_info("dt10063708"))
+    print(mkb.get_whole_info("dt10082480"))
 
