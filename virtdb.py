@@ -153,7 +153,7 @@ class OdbcVirtDB(VirtDB):
         #print ("Query:%s"%sq)
         try:
             #results = [(r[0][0], r[1][0]) for r in cursor.execute(sq).fetchall()]
-	    results = []
+        results = []
 	    for r in cursor.execute(sq).fetchall():
 		y = []
 		for x in r: y.append(x[0])
