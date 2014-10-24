@@ -4,11 +4,10 @@ import os
 import sys
 import re
 
-import pyodbc
-import codecs
 
 if not re.match('linux',sys.platform):
     from jpype import *
+
 
 import urllib 
 if sys.version[0] == '3':
@@ -19,7 +18,9 @@ else:
     import urllib2
     from urllib import urlencode 
 
+
 import json
+import pyodbc
 
 from utils import *
 
@@ -27,15 +28,16 @@ class VirtDB(object):
     """
     """
 
-    def __init__(self, uid, pwd, graph, dsn=None, driver=None, host=None, port=None):
+    def __init__(self, uid, pwd, graph, dsn=None,
+                 driver=None, host=None, port=None):
         self.HOST = host
         self.PORT = port
-        self.DSN = dsn 
+        self.DSN = dsn
         self.DRIVER = driver
-        self.UID = uid 
-        self.PWD = pwd 
+        self.UID = uid
+        self.PWD = pwd
         self.GRAPH = graph
-        self.charset="UTF-8"
+        self.charset = "UTF-8"
 
     def connect(self):
         raise NotImplementedError("Subclasses should implement this!")
@@ -71,17 +73,17 @@ class HttpDB(VirtDB):
         """
 
         param = {
-                #"id_":id_,
-                #"type":t,
-                "sq":sq,
-                "prefix":self.prefix,
-                "graph":self.GRAPH,
-                "uid":self.UID,
-                "pwd":self.PWD,
-                "host":self.HOST,
-                "port":self.PORT,
-                "dsn":self.DSN,
-                "driver":self.DRIVER
+                # "id_":id_,
+                # "type":t,
+                "sq": sq,
+                "prefix": self.prefix,
+                "graph": self.GRAPH,
+                "uid": self.UID,
+                "pwd": self.PWD,
+                "host": self.HOST,
+                "port": self.PORT,
+                "dsn": self.DSN,
+                "driver": self.DRIVER
                 }
 
         f = urllib2.urlopen(urllib2.Request(self.url, urlencode(param).encode('utf-8')))
@@ -100,18 +102,21 @@ class OdbcVirtDB(VirtDB):
         VirtDB.__init__(self, uid, pwd, graph, dsn, driver, host, port)
 
         self.db = None
+        self.driver = driver
 
     def connect(self):
         pass
 
-    def query(self, sq):
+    def query2(self, sq):
         try:
             if self.DSN:
                 self.db = pyodbc.connect("DSN=%s;UID=%s;PWD=%s;charset=%s"%(self.DSN, self.UID, self.PWD, self.charset) )
         except Exception as e:
             print (e)
+
             if self.driver:
-                self.db = pyodbc.connect('DRIVER={%s};HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'%(self.DRIVER, self.HOST, str(self.PORT), self.UID, self.PWD))
+                self.db = pyodbc.connect('DRIVER={%s};HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'
+                                         %(self.DRIVER, self.HOST, str(self.PORT), self.UID, self.PWD))
             else:
                 raise ValueError("Need DSN or DRIVER&&HOST&&PORT")
 
@@ -131,6 +136,36 @@ class OdbcVirtDB(VirtDB):
 
     def close(self):
         pass
+
+    def query(self, sq):
+        try:
+            if self.DSN:
+                self.db = pyodbc.connect("DSN=%s;UID=%s;PWD=%s;charset=%s"%(self.DSN, self.UID, self.PWD, self.charset) )
+        except Exception as e:
+            print(e)
+            if self.driver:
+                self.db = pyodbc.connect('DRIVER={%s};HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'%(self.DRIVER, self.HOST, str(self.PORT), self.UID, self.PWD))
+            else:
+                raise ValueError("Need DSN or DRIVER&&HOST&&PORT")
+
+        sq = "sparql " + sq
+        cursor = self.db.cursor()
+        print ("Query:%s"%sq)
+        try:
+            #results = [(r[0][0], r[1][0]) for r in cursor.execute(sq).fetchall()]
+	    results = []
+	    for r in cursor.execute(sq).fetchall():
+		y = []
+		for x in r: y.append(x[0])
+		results.append(tuple(y))
+           #if results and len(results) > 0 and type(results[0]) == tuple:
+            #    results = [r[0] for r in results]
+        except TypeError:
+            return []
+        finally:
+            cursor.close()
+            self.db.close()
+        return results
 
 
 class JenaVirtDB(VirtDB):
@@ -165,21 +200,5 @@ class JenaVirtDB(VirtDB):
         shutdownJVM()
 
 if __name__ == "__main__":
-    configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
-    string = "select * where {<http://keg.tsinghua.edu.cn/movie/instance/" + str('b10050542') + "> ?p"+" ?o}"
-
-    #db = JenaVirtDB(**configs)
-
-    configs["url"] = "http://10.1.1.23:5678/query"
-    configs["prefix"] = 'http://keg.tsinghua.edu.cn/movie/'
-
-    db = HttpDB(**configs)
-    for r in db.query(string):
-        print (r[0]+" "+r[1])
-    
-    #for r in db.query("instance","b10050542"):
-    #    print (r[0]+" "+r[1])
-        
-
-    
+    pass
 
