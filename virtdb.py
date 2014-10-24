@@ -150,7 +150,7 @@ class OdbcVirtDB(VirtDB):
 
         sq = "sparql " + sq
         cursor = self.db.cursor()
-        print ("Query:%s"%sq)
+        #print ("Query:%s"%sq)
         try:
             #results = [(r[0][0], r[1][0]) for r in cursor.execute(sq).fetchall()]
 	    results = []

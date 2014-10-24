@@ -84,7 +84,7 @@ class MovieKB():
             v: list of object
         """
         sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
-        result_set = self.db.query(sq)
+        result_set = self.db.query2(sq)
         result = {}
         for p, o in result_set:
             result[p] = result.get(p,[]) + [o]
@@ -552,12 +552,13 @@ class MovieKB():
         return sq
 
 if __name__ == "__main__":
-    configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
+    #configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
     mkb = MovieKB()
     #print mkb.get_prop_entities("b10050542")
+    print mkb.get_whole_info_label("dt10001069")["instanceOf"][0]
     #print mkb.getUriByName("冯小刚")
-    fw = codecs.open('test.txt','w','utf-8')
-    fw.write(json.dumps(mkb.get_entity_info("b10000001"),ensure_ascii=False))
-    fw.close()
+    #fw = codecs.open('test.txt','w','utf-8')
+    #fw.write(json.dumps(mkb.get_whole_info_label("b10000001"),ensure_ascii=False))
+    #fw.close()
 
 

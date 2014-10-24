@@ -344,8 +344,8 @@ if __name__=="__main__":
 
     trie = marisa_trie.Trie()
     trie.load('./data/m2e.trie')
-# #     result = trie.keys(u'冯绍峰')
-# #     print(result)
+    result = trie.keys(u'冯绍峰')
+    print(result)
     m_e = load_mention_entity("./data/mention.entity_www")
 #     linking("./data/test/","./data/test-fulltext-thre-result/")
 #     linking2("./data/test/","./data/test-fulltext-thre-result/")

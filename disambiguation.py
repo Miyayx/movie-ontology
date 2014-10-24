@@ -92,32 +92,34 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
         return es
     
     movie_commented = db.get_whole_info_label(movie_id)
+    print(movie_commented["instanceOf"])
     c_sim = {}
     for c in  cans:
         print("Can ID: " + c)
         can_obj = db.get_whole_info_label(c)
+#	print(can_obj.get("instanceOf",[]))
         es1 = set()#两个电影比较，共现属性名集合
         es2 = set()#人物与电影比较，该人物出现在电影相应人物属性列表中则进该集合，权重*8
         es3 = set()#候选实体为人物，进该集合。权重*2
         es4 = set()#放在各种括号内的实体一定要加分 权重 *4
         
         if (location > 0) and (location + len(mention) < len(context)):
-            if context[location-1] == "《" and context[location + len(mention)] =="》":
+            if context[location-1] ==u"《" and context[location + len(mention)] ==u"》":
                 es4.add(mention)
-            elif context[location-1] == "(" and context[location + len(mention)] ==")":
+            elif context[location-1] == u"(" and context[location + len(mention)] ==u")":
                 es4.add(mention)
-            elif context[location-1] == "【" and context[location + len(mention)] =="】":
+            elif context[location-1] == u"【" and context[location + len(mention)] ==u"】":
                 es4.add(mention)
-            elif context[location-1] == "（" and context[location + len(mention)] =="）":
+            elif context[location-1] == u"（" and context[location + len(mention)] ==u"）":
                 es4.add(mention)
-            elif context[location-1] == "[" and context[location + len(mention)] =="]":
+            elif context[location-1] == u"[" and context[location + len(mention)] ==u"]":
                 es4.add(mention)
-            elif context[location-1] == "#" and context[location + len(mention)] =="#":
+            elif context[location-1] == u"#" and context[location + len(mention)] ==u"#":
                 es4.add(mention)
                 
-        if '电影' in can_obj.get("instanceOf",[]) or '电视' in can_obj.get("instanceOf",[]):
+        if u'电影' in can_obj.get("instanceOf",[]) or u'电视' in can_obj.get("instanceOf",[]):
             es1 = movie2movie_sim(movie_commented,can_obj)
-        if '演员' in can_obj.get("instanceOf",[]):
+        if u'演员' in can_obj.get("instanceOf",[]):
             if mention in can_obj.get("label/zh","")[0] :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
@@ -128,7 +130,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
                 if item in movie_commented.get("actor_list",[]):
                     es2.add(item) 
                 
-        if '导演' in can_obj.get("instanceOf",[]):
+        if u'导演' in can_obj.get("instanceOf",[]):
             if mention == can_obj.get("label/zh","")[0] :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
@@ -138,7 +140,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
             for item in can_obj.get("alias",[]):
                 if item in movie_commented.get("directed_by",[]):
                     es2.add(item)
-        if '制片人' in can_obj.get("instanceOf",[]):
+        if u'制片人' in can_obj.get("instanceOf",[]):
             if mention == can_obj.get("label/zh","")[0] :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
@@ -148,7 +150,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
             for item in can_obj.get("alias",[]):
                 if item in movie_commented.get("produced_by",[]):
                     es2.add(item)
-        if '编剧' in can_obj.get("instanceOf",[]):
+        if u'编剧' in can_obj.get("instanceOf",[]):
             if mention == can_obj.get("label/zh","")[0] :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
@@ -157,7 +159,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
             for item in can_obj.get("alias",[]):
                 if item in movie_commented.get("written_by",[]):
                     es2.add(item)
-        if '摄影师' in can_obj.get("instanceOf",[]):
+        if u'摄影师' in can_obj.get("instanceOf",[]):
             if mention == can_obj.get("label/zh","")[0] :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
@@ -166,7 +168,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
             for item in can_obj.get("alias",[]):
                 if item in movie_commented.get("cinematograph_by",[]):
                     es2.add(item)
-        if '音乐指导' in can_obj.get("instanceOf",[]):
+        if u'音乐指导' in can_obj.get("instanceOf",[]):
             if mention == can_obj.get("label/zh","")[0] :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
@@ -175,7 +177,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
             for item in can_obj.get("alias",[]):
                 if item in movie_commented.get("music_by",[]):
                     es2.add(item)
-        if '主持人' in can_obj.get("instanceOf",[]):
+        if u'主持人' in can_obj.get("instanceOf",[]):
             if mention == can_obj.get("label/zh","")[0] :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
@@ -184,7 +186,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
             for item in can_obj.get("alias",[]):
                 if item in movie_commented.get("presenter",[]):
                     es2.add(item)
-        if '配音' in can_obj.get("instanceOf",[]):
+        if u'配音' in can_obj.get("instanceOf",[]):
             if mention == can_obj.get("label/zh","")[0] :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
