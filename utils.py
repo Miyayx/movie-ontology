@@ -33,6 +33,7 @@ def getPropMap():
                         "<http://keg.tsinghua.edu.cn/movie/common/summary>":"Summary",
                         "<http://keg.tsinghua.edu.cn/movie/common/description/zh>":"FullText",
                         "<http://keg.tsinghua.edu.cn/movie/common/image>":"Images",
+                        "<http://keg.tsinghua.edu.cn/movie/object/description/zh>":"FullText",
                         "<http://keg.tsinghua.edu.cn/movie/common/firstimage>":"FirstImage",
                         "<http://keg.tsinghua.edu.cn/movie/common/imdb>":"imdb",
                         "<http://keg.tsinghua.edu.cn/movie/common/topic_equivalent_webpage>":u"来源网站",

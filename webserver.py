@@ -16,15 +16,16 @@ class LinkingResource(Resource):
     def render_GET(self, request):
         request.setHeader("Access-Control-Allow-Origin","*")
         request.setHeader("Content-Type","application/json")
-        
+
         return self.render_POST(request)
 
-    def render_POST(self, request):
+    def render_POST2(self, request):
         request.setHeader("Access-Control-Allow-Origin","*")
         request.setHeader("Content-Type","application/json")
-        
+
         name = dict((k,v[0]) for k, v in request.args.items())['query']
         mkb = MovieKB()
+        '''
         uris = mkb.getUriByName(name)
         if len(uris) == 0:
             return json.dumps({})
@@ -33,10 +34,27 @@ class LinkingResource(Resource):
         #return str(json.dumps(mkb.parse_properties(p2o)))
 
         return str(json.dumps(mkb.get_entity_info(u)))
+        '''
+        #print name
+        #print json.dumps(mkb.searchQuery(name))
+        return str(json.dumps(mkb.searchQuery(name)))
 
+    def render_POST(self, request):
+        request.setHeader("Access-Control-Allow-Origin","*")
+        request.setHeader("Content-Type","application/json")
+        param = dict((k,v[0]) for k, v in request.args.items())
+        mkb = MovieKB()
+        if 'query' in param:
+            name = param['query']
+            return str(json.dumps(mkb.searchQuery(name)))
+        elif 'uri' in param:
+			name = param['uri']
+			result = mkb.get_entity_info(name)
+			result['gtype'] = "instance"
+			return str(json.dumps(result))
 
 class PageResource(Resource):
-     
+
     def render_GET(self,request):
         request.setHeader("Access-Control-Allow-Origin","*")
         request.setHeader("Content-Type","application/json")
