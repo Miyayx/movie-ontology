@@ -105,9 +105,6 @@ class OdbcVirtDB(VirtDB):
         self.driver = driver
 
     def connect(self):
-        pass
-
-    def query(self, sq):
         try:
             if self.DSN:
                 self.db = pyodbc.connect("DSN=%s;UID=%s;PWD=%s;charset=%s"%(self.DSN, self.UID, self.PWD, self.charset) )
@@ -119,6 +116,10 @@ class OdbcVirtDB(VirtDB):
                                          %(self.DRIVER, self.HOST, str(self.PORT), self.UID, self.PWD))
             else:
                 raise ValueError("Need DSN or DRIVER&&HOST&&PORT")
+
+    def query(self, sq):
+        if not self.db:
+            self.connect()
 
         sq = "sparql " + sq
         cursor = self.db.cursor()
@@ -132,22 +133,11 @@ class OdbcVirtDB(VirtDB):
             return []
         finally:
             cursor.close()
-            self.db.close()
         return results
 
-    def close(self):
-        pass
-
     def query2(self, sq):
-        try:
-            if self.DSN:
-                self.db = pyodbc.connect("DSN=%s;UID=%s;PWD=%s;charset=%s"%(self.DSN, self.UID, self.PWD, self.charset) )
-        except Exception as e:
-            print(e)
-            if self.driver:
-                self.db = pyodbc.connect('DRIVER={%s};HOST=%s:%s;UID=%s;PWD=%s;charset=UTF-8'%(self.DRIVER, self.HOST, str(self.PORT), self.UID, self.PWD))
-            else:
-                raise ValueError("Need DSN or DRIVER&&HOST&&PORT")
+        if not self.db:
+            self.connect()
 
         sq = "sparql " + sq
         cursor = self.db.cursor()
@@ -163,8 +153,10 @@ class OdbcVirtDB(VirtDB):
             return []
         finally:
             cursor.close()
-            self.db.close()
         return results
+
+    def close(self):
+        self.db.close()
 
 
 class JenaVirtDB(VirtDB):

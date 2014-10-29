@@ -556,9 +556,9 @@ class MovieKB():
 if __name__ == "__main__":
     #configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
     mkb = MovieKB()
-    #print mkb.get_prop_entities("b10050542")
-    #print mkb.get_whole_info_label("dt10001069")["instanceOf"][0]
-    #print mkb.getUriByName("冯小刚")
+    print mkb.get_prop_entities("b10050542")
+    print mkb.get_whole_info_label("dt10001069")["instanceOf"][0]
+    print mkb.getUriByName("冯小刚")
     print (mkb.get_entity_info("http://keg.tsinghua.edu.cn/movie/concept/1000200"))
     #fw = codecs.open('test.txt','w','utf-8')
     #fw.write(json.dumps(mkb.get_whole_info_label("b10000001"),ensure_ascii=False))

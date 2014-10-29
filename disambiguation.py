@@ -258,7 +258,7 @@ def entity_cooccur(db, mention, mentions, context_mentions,cans, threshold=None)
 
 class Disambiguation():
 
-    def __init__(self, func=None, args = {}):
+    def __init__(self, func=None, args={}):
 
         if not func:
             raise ValueError("Not add strategy")
