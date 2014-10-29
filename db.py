@@ -277,7 +277,7 @@ class MovieKB():
     def get_abstract(self, entity_id):
         #sq = 'select * from <%s> where {<%sinstance/%s> <%scommon/summary> ?o }'%(GRAPH, PREFIX, entity_id, PREFIX)
         sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
-        result_set = self.db.query(sq)
+        result_set = self.db.query2(sq)
         for p, o in result_set:
             if p.endswith('common/summary'):
                 return o
@@ -287,7 +287,7 @@ class MovieKB():
     def get_label(self, entity_id):
         #sq = 'select * from <%s> where {<%sinstance/%s> <%scommon/summary> ?o }'%(GRAPH, PREFIX, entity_id, PREFIX)
         sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
-        result_set = self.db.query(sq)
+        result_set = self.db.query2(sq)
         for p, o in result_set:
             if p.endswith('label/zh'):
                 return o
@@ -298,7 +298,7 @@ class MovieKB():
         """
         #sq = 'select * from <%s> where {<%sinstance/%s> <%scommon/summary> ?o }'%(GRAPH, PREFIX, entity_id, PREFIX)
         sq = 'select * from <%s> where {<%s> ?p ?o}'%(GRAPH, uri)
-        result_set = self.db.query(sq)
+        result_set = self.db.query2(sq)
         for p, o in result_set:
             if p.endswith('label/zh'):
                 return o
@@ -309,7 +309,7 @@ class MovieKB():
         """
         #sq = 'select * from <%s> where {<%sinstance/%s> <%scommon/summary> ?o }'%(GRAPH, PREFIX, entity_id, PREFIX)
         sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
-        result_set = self.db.query(sq)
+        result_set = self.db.query2(sq)
         for p, o in result_set:
             if p.endswith('actor_name'):
                 return o
@@ -320,10 +320,11 @@ class MovieKB():
         """
         #sq = 'select * from <%s> where {<%sinstance/%s> <%scommon/summary> ?o }'%(GRAPH, PREFIX, entity_id, PREFIX)
         sq = 'select * from <%s> where {<%s> ?p ?o}'%(GRAPH, uri)
-        result_set = self.db.query(sq)
+        result_set = self.db.query2(sq)
         for p, o in result_set:
-            if p.endswith('actor_name'):
-                return o
+            if p.endswith('actor_id'):
+                label = self.get_label_uri(o)
+                return label
             
     def get_bb_obj_uri(self, uri):
         """
@@ -331,7 +332,7 @@ class MovieKB():
         """
         #sq = 'select * from <%s> where {<%sinstance/%s> <%scommon/summary> ?o }'%(GRAPH, PREFIX, entity_id, PREFIX)
         sq = 'select * from <%s> where {<%s> ?p ?o}'%(GRAPH, uri)
-        result_set = self.db.query(sq)
+        result_set = self.db.query2(sq)
         for p, o in result_set:
             if p.endswith('actor_id'):
                 return o
@@ -339,7 +340,7 @@ class MovieKB():
     def get_concept_label(self, entity_id):
 #         sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
         sq = 'select * from <%s> where {<%sconcept/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
-        result_set = self.db.query(sq)
+        result_set = self.db.query2(sq)
         for p, o in result_set:
             if p.endswith('label/zh'):
                 return o
@@ -371,7 +372,7 @@ class MovieKB():
     def get_entity_label(self, entity_id):
         #sq = 'select * from <%s> where { <%s> <%sobject/label/zh> ?o }'%(GRAPH, entity_id, PREFIX)
         sq = 'select * from <%s> where {<%s> ?p ?o}'%(GRAPH, entity_id)
-        result_set = self.db.query(sq)
+        result_set = self.db.query2(sq)
         for p, o in result_set:
             if p.endswith('label/zh'):
                 return o
@@ -383,7 +384,8 @@ class MovieKB():
             result = {}
             objects= {}
             sq = 'select * from <%s> where {<%sinstance/%s> ?p ?o}'%(GRAPH, PREFIX,entity_id)
-            result_set = self.db.query(sq)
+            #sq = 'select * from <%s> where {<%s> ?p ?o}'%(GRAPH, entity_id)
+            result_set = self.db.query2(sq)
             for p, o in result_set:
                 p = "<%s>"%p
                 if p in  predictmap['objectType']:
@@ -421,7 +423,7 @@ class MovieKB():
                     actor_info = [{} for i in range(len(objects[u'演员表']))]
                     for uid in objects[u'演员表']:
                         sq = 'select * from <%s> where {<%s> ?p ?o}'%(GRAPH,uid)
-                        result_set = self.db.query(sq)
+                        result_set = self.db.query2(sq)
 
                         actor_num = 0
                         actor_name=""
@@ -461,7 +463,7 @@ class MovieKB():
              {?s  <http://keg.tsinghua.edu.cn/movie/object/label/zh> "%s"} union {?s  <http://keg.tsinghua.edu.cn/movie/common/alias> "%s"}
             }
             """%(name,name)
-        result_set = self.db.query(sq)
+        result_set = self.db.query2(sq)
         return [x[0] for x in result_set]
 
     #导演 演员 合作 作品  冯小刚 葛优
@@ -509,7 +511,7 @@ class MovieKB():
                 optional {?a <http://keg.tsinghua.edu.cn/movie/people/spouse/zh> ?z.} }
             """%(name,name)
         '''
-        result_set = self.db.query(sq)
+        result_set = self.db.query22(sq)
         result = []
         for m,o in result_set:
             e = {}
@@ -537,7 +539,7 @@ class MovieKB():
             FILTER regex(?p, "香港", "i")
         }"""
         '''
-        result_set = self.db.query(sq)
+        result_set = self.db.query2(sq)
         result = []
         for name,company,nation,bplace,gender in result_set:
             e = {}
@@ -555,8 +557,9 @@ if __name__ == "__main__":
     #configs = ConfigTool.parse_config("./config/db.cfg","MovieKB")
     mkb = MovieKB()
     #print mkb.get_prop_entities("b10050542")
-    print mkb.get_whole_info_label("dt10001069")["instanceOf"][0]
+    #print mkb.get_whole_info_label("dt10001069")["instanceOf"][0]
     #print mkb.getUriByName("冯小刚")
+    print (mkb.get_entity_info("http://keg.tsinghua.edu.cn/movie/concept/1000200"))
     #fw = codecs.open('test.txt','w','utf-8')
     #fw.write(json.dumps(mkb.get_whole_info_label("b10000001"),ensure_ascii=False))
     #fw.close()

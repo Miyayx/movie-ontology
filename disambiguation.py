@@ -4,13 +4,16 @@
 import nltk
 import string
 import math
-
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 import jieba
 
 from collections import Counter
 
 from model.query import Query
 from db import *
+from WordsSplit import SplitByLanguage
 
 
 def normalize(d):
@@ -70,7 +73,7 @@ def context_sim(mention, cans, doc, db, num=0, threshold=None):
 
     return c_sim
 
-def ranking(db,mention,location,cans,movie_id,context,threshold=None):
+def ranking(db,mention,context,location,cans,movie_id,threshold=None):
     """
             利用被评论电影的信息进行ranking
     """
@@ -92,10 +95,12 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
         return es
     
     movie_commented = db.get_whole_info_label(movie_id)
-    print(movie_commented["instanceOf"])
+#    print(movie_commented)
+#    print(db)
     c_sim = {}
+    c_info = {}
     for c in  cans:
-        print("Can ID: " + c)
+#         print("Can ID: " + c)
         can_obj = db.get_whole_info_label(c)
 #	print(can_obj.get("instanceOf",[]))
         es1 = set()#两个电影比较，共现属性名集合
@@ -120,7 +125,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
         if u'电影' in can_obj.get("instanceOf",[]) or u'电视' in can_obj.get("instanceOf",[]):
             es1 = movie2movie_sim(movie_commented,can_obj)
         if u'演员' in can_obj.get("instanceOf",[]):
-            if mention in can_obj.get("label/zh","")[0] :
+            if mention in can_obj.get("label/zh",[]) :#候选实体为人物，且mention与该候选实体的正名相同
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
 #                 if item in movie_commented["actor_list"]:
@@ -131,7 +136,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
                     es2.add(item) 
                 
         if u'导演' in can_obj.get("instanceOf",[]):
-            if mention == can_obj.get("label/zh","")[0] :
+            if mention in can_obj.get("label/zh",[])  :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
 #                 if item in movie_commented["directed_by"]:
@@ -141,7 +146,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
                 if item in movie_commented.get("directed_by",[]):
                     es2.add(item)
         if u'制片人' in can_obj.get("instanceOf",[]):
-            if mention == can_obj.get("label/zh","")[0] :
+            if mention in can_obj.get("label/zh",[])  :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
 #                 if item in movie_commented["produced_by"]:
@@ -151,7 +156,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
                 if item in movie_commented.get("produced_by",[]):
                     es2.add(item)
         if u'编剧' in can_obj.get("instanceOf",[]):
-            if mention == can_obj.get("label/zh","")[0] :
+            if mention in can_obj.get("label/zh",[])  :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
                 if item in movie_commented.get("written_by",[]):
@@ -160,7 +165,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
                 if item in movie_commented.get("written_by",[]):
                     es2.add(item)
         if u'摄影师' in can_obj.get("instanceOf",[]):
-            if mention == can_obj.get("label/zh","")[0] :
+            if mention in can_obj.get("label/zh",[])  :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
                 if item in movie_commented.get("cinematograph_by",[]):
@@ -169,7 +174,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
                 if item in movie_commented.get("cinematograph_by",[]):
                     es2.add(item)
         if u'音乐指导' in can_obj.get("instanceOf",[]):
-            if mention == can_obj.get("label/zh","")[0] :
+            if mention in can_obj.get("label/zh",[]) :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
                 if item in movie_commented.get("music_by",[]):
@@ -178,7 +183,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
                 if item in movie_commented.get("music_by",[]):
                     es2.add(item)
         if u'主持人' in can_obj.get("instanceOf",[]):
-            if mention == can_obj.get("label/zh","")[0] :
+            if mention in can_obj.get("label/zh",[])  :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
                 if item in movie_commented.get("presenter",[]):
@@ -187,7 +192,7 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
                 if item in movie_commented.get("presenter",[]):
                     es2.add(item)
         if u'配音' in can_obj.get("instanceOf",[]):
-            if mention == can_obj.get("label/zh","")[0] :
+            if mention in can_obj.get("label/zh",[])  :
                 es3.add(mention)
             for item in can_obj.get("label/zh",[]):
                 if item in movie_commented.get("dubbing_performances",[]):
@@ -196,9 +201,10 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
                 if item in movie_commented.get("dubbing_performances",[]):
                     es2.add(item)
         c_sim[c] = (len(es1)+8*len(es2)+2*len(es3)+4*len(es4),es1,es2,es3,es4)
+        c_info[c] = can_obj.get("label/zh",[""])[0]
         
-    for k,v in c_sim.items():
-        print (k+" "+str(v))
+#     for k,v in c_sim.items():
+#         print (k+" "+str(v))
         #c_sim[k] = v*1.0/len(mentions)
 #         c_sim[k] = v*1.0/len(context_mentions)
 
@@ -208,9 +214,10 @@ def ranking(db,mention,location,cans,movie_id,context,threshold=None):
         for k,v in list(c_sim.items()):
             if v[0] < threshold:
                 c_sim.pop(k)
+                c_info.pop(k)
 
 
-    return c_sim
+    return (c_info,c_sim)
             
         
     
@@ -272,13 +279,13 @@ class Disambiguation():
             return all candidate with their similarity
         """
 
-        c_sim = self.func(**self.args)
+        (c_info,c_sim) = self.func(**self.args)
 
         best = sorted(c_sim.items(), key=lambda x:x[1][0], reverse=True)
         if num:
-            return best[:num]
+            return best[:num],c_info
         else:
-            return best
+            return best,c_info
 
 
 class Distance():

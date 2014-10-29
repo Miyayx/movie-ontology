@@ -6,6 +6,10 @@ import jieba
 import marisa_trie
 import re
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 from model.query import Query
 from model.little_entity import LittleEntity
 from disambiguation import *
@@ -16,6 +20,8 @@ PUNCT = set(u''':!),.:;?]}¢'"、。〉》」』】〕〗〞︰︱︳﹐､﹒
         ﹔﹕﹖﹗﹚﹜﹞！），．：；？｜｝︴︶︸︺︼︾﹀﹂﹄﹏､～￠
         々‖•·ˇˉ―--′’”([{£¥'"‵〈《「『【〔〖（［｛￡￥〝︵︷︹︻
         ︽︿﹁﹃﹙﹛﹝（｛“‘-—_…''')
+
+PREFIX = 'http://keg.tsinghua.edu.cn/movie/'
 
 class MovieEL():
 
@@ -28,6 +34,16 @@ class MovieEL():
         self.trie = trie
         self.can_set = can_set
         self.full_mentions = None
+        
+    def destroy(self):
+        del self.can_set
+        del self.comment
+        del self.context
+        del self.db
+        del self.queries
+        del self.trie
+        del self.movie_id
+
 
     def set_topic_mentions(self, mentions):
         self.full_mentions = mentions
@@ -72,7 +88,7 @@ class MovieEL():
 
         mentions = []
 
-        print ("comment:"+comment)
+#         print ("comment:"+comment)
         segs = self.word_segmentation(comment)
     
         i = 0
@@ -97,16 +113,16 @@ class MovieEL():
                             offset = 1 #如果字符串的第一个字是标点，可能会影响匹配结果，跳过标点再匹配
                     break
             i += offset
-        print(mentions)
+#         print(mentions)
         return mentions
     
 
     def get_entity(self):
 
-        if self.full_mentions:
-            con_mens = self.full_mentions
-        else:
-            con_mens = [q.text for q in self.queries]
+#         if self.full_mentions:
+#             con_mens = self.full_mentions
+#         else:
+#             con_mens = [q.text for q in self.queries]
 
         mentions = [q.text for q in self.queries]
 
@@ -118,7 +134,7 @@ class MovieEL():
             cans = [c[1:-1].split("/")[-1] for c in cans]
             
             if cans:
-                print ("candidate of " +q.text)
+#                 print ("candidate of " +q.text)
 
                 ####### context_sim ##########
 #                 args = {
@@ -147,20 +163,23 @@ class MovieEL():
                         "movie_id":self.movie_id,
                         "cans":cans,
                         "mention":q.text,
-                        "location":q.index,
                         "context":self.comment,
+                        "location":q.index,
                         "db":self.db,
                         "threshold":4
                         }
                 d = Disambiguation(ranking, args)
  
-                can_sim = d.get_sorted_cans(1) #top 3
+                can_sim,c_info = d.get_sorted_cans(1) #top 3
 #                 can_sim = d.get_best() #top 3
 
                 for e_id, sim in can_sim:
-                    le = self.db.create_littleentity(e_id)
-                    e = LittleEntity(**le)
-                    e.sim = sim
+#                     le = self.db.create_littleentity(e_id)
+#                     e = LittleEntity(**le)
+                    
+                    uri = PREFIX + 'instance/' + e_id
+                    title = c_info[e_id]
+                    e = LittleEntity(e_id,uri,title,sim)
                     q.entities.append(e)
             #else:
             #    self.queries.remove(q)
@@ -269,7 +288,15 @@ def linking(in_dir, out_dir, fun=None):
                     if len(q.entities) > 0:
                         for e in q.entities:
                             print (q.text+","+e.title+":"+str(e.sim))
-                            fw.write("%d:::%s:::%d:::%d;;;%s:::%s:::%s\n"%(count, q.text, q.index, q.index+len(q.text), e.uri, e.title, str(e.sim)))
+			    #output = {u"lineNum":count,u"mention":q.text,"location":q.index,"uri":e.uri,"title":e.title}
+			    #outputput = [count,q.text,q.index,q.index+len(q.text), e.uri,e.title]
+			    #output += e.sim
+		 	    
+                            fw.write("%d:::%s:::%d:::%d;;;%s:::%s:::("%(count, q.text, q.index, q.index+len(q.text), e.uri, e.title))
+                            for item in e.sim:
+                                fw.write('(' + item + ') ')
+                            fw.write(')')
+                            fw.write('\n')
                     #else:
                     #    fw.write("%d:::%s:::%d:::%d;;;"%(count, q.text, q.index, q.index+len(q.text)))
 
@@ -282,7 +309,7 @@ def linking(in_dir, out_dir, fun=None):
     
     
     
-def linking2(in_dir, out_dir,fun=None):
+def linking2(in_dir, out_dir,trie, m_e,fun=None):
 
     db = MovieKB()
 
@@ -293,63 +320,85 @@ def linking2(in_dir, out_dir,fun=None):
         
 
         
-    for name in os.listdir(in_dir):
-        fw = codecs.open(out_dir+name+"-threshold4", "w", "utf-8")
-        full_text = ""
-        fi = codecs.open(in_dir+name, 'r', "utf-8")
-        count = 0
-        total_mentions = 0
-        for line in  fi :
-            if line.startswith("Title:"):
-                    title = line.split(":::")[0][6:]
-                    movie_id = line.split(":::")[1]
-                    print("the title of movie commented is :" + title)
-                    print("the id of movie commented is : "+ movie_id)
-            elif "{" in line and "content" in line:
-                main = line[line.find("{"):]
-                try:
-                    comment_dict = json.loads(main)
-                    c = comment_dict["content"].lower()
-                except:
-                    print("error line: " +line)
-                    continue
-
-                count += 1
+    for sub_dir in os.listdir(in_dir):
+        if not os.path.isdir(out_dir + sub_dir ):
+            os.mkdir(out_dir + sub_dir)
+        pair = sub_dir.split('-')
+        if len(pair) < 2:
+            continue
+        title = pair[0]
+        movie_id = pair[1]
+        print(title)
+        print(movie_id)
+        for name in os.listdir(in_dir + sub_dir):             
+            fw = codecs.open(out_dir+sub_dir+'/' +name + 'threshold4', 'w', "utf-8")
+            full_text = ""
+            fi = codecs.open(in_dir+sub_dir+'/' +name, 'r', "utf-8")
+            count = 0
+            total_mentions = 0
+            print("current article is :  "+in_dir+sub_dir+'/' +name)
+            for line in  fi :
+                
+                if "{" in line and "content" in line:
+                    
+                    main = line[line.find("{"):]
+                    try:
+                        comment_dict = json.loads(main)
+                        c = comment_dict["content"].lower()
+                    except:
+                        print("error line: " +line)
+                        continue
     
-                c = c.strip("\n")
-                movieel = MovieEL(c, trie, m_e,db,movie_id)
-                movieel.run()
+                    count += 1
+        
+                    c = c.strip("\n")
+                    movieel = MovieEL(c, trie, m_e,db,movie_id)
+                    movieel.run()
+                    print("the line number is : %d and number of queries(mentions):%d"%(count,len(movieel.queries)))
+#                     print ("Num of queries(mentions):%d"%len(movieel.queries))
+                    for q in movieel.queries:
+                        if len(q.entities) > 0:
+                            total_mentions += 1
+                            for e in q.entities:
+#                                 print (q.text+","+e.title+":"+str(e.sim))
+#                                 fw.write("%d:::%s:::%d:::%d;;;%s:::%s:::("%(count, q.text, q.index, q.index+len(q.text), e.uri, e.title))
+                                fw.write('{"comment_id":%d,"mention":"%s","pos":%d,"uri":"%s","title":"%s"}:::('%(count, q.text, q.index, e.uri, e.title))
+                                for s in e.sim:
+                                    fw.write('[')
+                                    if type(s) == type(1):
+                                        fw.write('%d'%s)
+                                    if type(s) == type(set()):
+                                        for item in s:
+                                            fw.write(str(item) + ', ')
+                                    fw.write('], ')
+                                fw.write(')')
+                                fw.write('\n')
+                        #else:
+                        #    fw.write("%d:::%s:::%d:::%d;;;"%(count, q.text, q.index, q.index+len(q.text)))
+        
+                    #fw.write("====================================\n")
+    #                 fw.write("\n")
     
-                print ("Num of queries(mentions):%d"%len(movieel.queries))
-                for q in movieel.queries:
-                    if len(q.entities) > 0:
-                        total_mentions += 1
-                        for e in q.entities:
-                            print (q.text+","+e.title+":"+str(e.sim))
-                            fw.write("%d:::%s:::%d:::%d;;;%s:::%s:::%s\n"%(count, q.text, q.index, q.index+len(q.text)-1, e.uri, e.title, str(e.sim)))
-                    #else:
-                    #    fw.write("%d:::%s:::%d:::%d;;;"%(count, q.text, q.index, q.index+len(q.text)))
-    
-                #fw.write("====================================\n")
-#                 fw.write("\n")
-
-#                 fw.write("\n")
-        print("the total mentions of this comment are : %d"%total_mentions)
-        fw.write("the total mentions of this comment are : %d"%total_mentions )
-        fw.close()
-
+    #                 fw.write("\n")
+            print("the total mentions of this comment are : %d"%total_mentions)
+            fw.write("the total mentions of this comment are : %d"%total_mentions )
+            fw.close()
+            fi.close()
+            movieel.destroy()
+            del movieel
+            
     db.close()
     
 if __name__=="__main__":
 
     trie = marisa_trie.Trie()
     trie.load('./data/m2e.trie')
-    result = trie.keys(u'冯绍峰')
-    print(result)
+    #result = trie.keys(u'冯绍峰')
+    #print(result)
     m_e = load_mention_entity("./data/mention.entity_www")
 #     linking("./data/test/","./data/test-fulltext-thre-result/")
 #     linking2("./data/test/","./data/test-fulltext-thre-result/")
-    linking2("./data/input/","./data/output/")
+    linking2("./data/input/","./data/output/",trie, m_e)
     
 #     s = u"看这片之前要先看完《时间简史》，看完这片有助于理解《时间简史》，那先看哪个好呢？能把传统和现代、守旧与创新、严肃与浪漫这样结合的，也只有英国人做得到了。费劲巴啦地解释了多少条命的问题，其实就是为了换主角呗。新任博士为什么一出场就说肾的问题呢？他穿来穿去地爽，那女主角要不要老去呢？"
 #     movieel = MovieEL(s,trie,m_e)
