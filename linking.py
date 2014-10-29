@@ -15,6 +15,7 @@ from model.little_entity import LittleEntity
 from disambiguation import *
 from db import *
 import json
+from time import sleep
 
 PUNCT = set(u''':!),.:;?]}¢'"、。〉》」』】〕〗〞︰︱︳﹐､﹒
         ﹔﹕﹖﹗﹚﹜﹞！），．：；？｜｝︴︶︸︺︼︾﹀﹂﹄﹏､～￠
@@ -25,8 +26,9 @@ PREFIX = 'http://keg.tsinghua.edu.cn/movie/'
 
 class MovieEL():
 
-    def __init__(self,comment, trie, can_set, db = None,movie_id = None,context = None ):
+    def __init__(self,comment, trie, can_set, db = None,movie_id = None,movie_commented=None,context = None ):
         self.movie_id = movie_id
+        self.movie_commented = movie_commented
         self.comment = comment
         self.context = context if context else comment 
         self.queries = []
@@ -161,6 +163,7 @@ class MovieEL():
                 ############# movie_related ###########
                 args = {
                         "movie_id":self.movie_id,
+                        "movie_commented":self.movie_commented,
                         "cans":cans,
                         "mention":q.text,
                         "context":self.comment,
@@ -330,6 +333,9 @@ def linking2(in_dir, out_dir,trie, m_e,fun=None):
         movie_id = pair[1]
         print(title)
         print(movie_id)
+        db.db.connect()
+        movie_commented = db.get_whole_info_label(movie_id)
+        db.db.close()
         for name in os.listdir(in_dir + sub_dir):             
             fw = codecs.open(out_dir+sub_dir+'/' +name + 'threshold4', 'w', "utf-8")
             full_text = ""
@@ -352,9 +358,12 @@ def linking2(in_dir, out_dir,trie, m_e,fun=None):
                     count += 1
         
                     c = c.strip("\n")
-                    movieel = MovieEL(c, trie, m_e,db,movie_id)
+                    movieel = MovieEL(c, trie, m_e,db,movie_id,movie_commented)
+                    sleep(1)
+                    db.db.connect()
                     movieel.run()
-                    print("the line number is : %d and number of queries(mentions):%d"%(count,len(movieel.queries)))
+                    db.db.close()
+                    print("the number of queries(mentions) in the line %d  is: %d"%(count,len(movieel.queries)))
 #                     print ("Num of queries(mentions):%d"%len(movieel.queries))
                     for q in movieel.queries:
                         if len(q.entities) > 0:
@@ -362,16 +371,16 @@ def linking2(in_dir, out_dir,trie, m_e,fun=None):
                             for e in q.entities:
 #                                 print (q.text+","+e.title+":"+str(e.sim))
 #                                 fw.write("%d:::%s:::%d:::%d;;;%s:::%s:::("%(count, q.text, q.index, q.index+len(q.text), e.uri, e.title))
-                                fw.write('{"comment_id":%d,"mention":"%s","pos":%d,"uri":"%s","title":"%s"}:::('%(count, q.text, q.index, e.uri, e.title))
-                                for s in e.sim:
-                                    fw.write('[')
-                                    if type(s) == type(1):
-                                        fw.write('%d'%s)
-                                    if type(s) == type(set()):
-                                        for item in s:
-                                            fw.write(str(item) + ', ')
-                                    fw.write('], ')
-                                fw.write(')')
+                                fw.write('{"comment_id":%d,"mention":"%s","pos":%d,"uri":"%s","title":"%s"}'%(count, q.text, q.index, e.uri, e.title))
+#                                 for s in e.sim:
+#                                     fw.write('[')
+#                                     if type(s) == type(1):
+#                                         fw.write('%d'%s)
+#                                     if type(s) == type(set()):
+#                                         for item in s:
+#                                             fw.write(str(item) + ', ')
+#                                     fw.write('], ')
+#                                 fw.write(')')
                                 fw.write('\n')
                         #else:
                         #    fw.write("%d:::%s:::%d:::%d;;;"%(count, q.text, q.index, q.index+len(q.text)))
@@ -381,7 +390,7 @@ def linking2(in_dir, out_dir,trie, m_e,fun=None):
     
     #                 fw.write("\n")
             print("the total mentions of this comment are : %d"%total_mentions)
-            fw.write("the total mentions of this comment are : %d"%total_mentions )
+#             fw.write("the total mentions of this comment are : %d"%total_mentions )
             fw.close()
             fi.close()
             movieel.destroy()

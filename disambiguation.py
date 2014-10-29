@@ -73,7 +73,7 @@ def context_sim(mention, cans, doc, db, num=0, threshold=None):
 
     return c_sim
 
-def ranking(db,mention,context,location,cans,movie_id,threshold=None):
+def ranking(db,mention,context,location,cans,movie_id,movie_commented,threshold=None):
     """
             利用被评论电影的信息进行ranking
     """
@@ -94,7 +94,7 @@ def ranking(db,mention,context,location,cans,movie_id,threshold=None):
                         es = es.union(set(m1[key])&set(m2[key]))
         return es
     
-    movie_commented = db.get_whole_info_label(movie_id)
+#     movie_commented = db.get_whole_info_label(movie_id)
 #    print(movie_commented)
 #    print(db)
     c_sim = {}
