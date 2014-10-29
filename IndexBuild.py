@@ -229,7 +229,7 @@ def m2e_build_www(fin) :
         for name in split:
             if len(name) < 2:
                 continue
-            print(name +": " + entity)
+#             print(name +": " + entity)
             m2e[name] = list(set(m2e.get(name, []) +[entity]))
             if "·" in name :
                 m2e[name.replace("·","")] = list(set(m2e.get(name.replace("·",""), []) +[entity]))
