@@ -53,8 +53,8 @@ keg@Tsinghua
     Add db DSN in /etc/odbc.ini -> DSN
     ```
     [Movie]
-    Drvier         = VirtuosoODBC
-    Drvier64       = VirtuosoODBC
+    Driver         = VirtuosoODBC
+    Driver64       = VirtuosoODBC
     Address        = XXX.XXX.XXX.XXX:1111
 
     Servername and Port seem no use
