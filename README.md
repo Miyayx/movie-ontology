@@ -30,7 +30,7 @@ keg@Tsinghua
 ###Virtuoso
 * Fedora:
     ```
-    yum install unixODBC unixODBC-devel
+    yum install virtuoso-opensource
     pip install pyodbc 
     ```
 
