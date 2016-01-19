@@ -36,6 +36,7 @@ keg@Tsinghua
 
 * Ubuntu:
     ```
+    apt-get install virtuoso-opensource
     apt-get install unixODBC unixODBC-dev
     pip install pyodbc 
     ```
